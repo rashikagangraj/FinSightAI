@@ -1,0 +1,35 @@
+llm_backend: ollama          # "openai" or "ollama"
+
+openai:
+  model: gpt-4o-mini
+  embed_model: text-embedding-3-small
+  temperature: 0.1
+  max_tokens: 2048
+
+ollama:
+  base_url: http://localhost:11434
+  model: llama3.2:3b           # CPU-friendly; swap to qwen2.5:3b for better quality
+  embed_model: nomic-embed-text
+  temperature: 0.1
+  num_ctx: 4096                # context window (reduce to 2048 on low RAM)
+
+rag:
+  chunk_size: 512
+  chunk_overlap: 64
+  top_k: 5
+  bm25_weight: 0.4             # weight for keyword search in hybrid fusion
+  vector_weight: 0.6           # weight for semantic search in hybrid fusion
+
+storage:
+  chroma_persist_dir: ./data/chroma
+  collection_name: finagent_docs
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  log_level: INFO
+  stream_chunk_delay: 0.02     # seconds between SSE stream tokens
+
+agent:
+  max_iterations: 10
+  verbose: true

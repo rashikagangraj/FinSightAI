@@ -1,0 +1,66 @@
+APPLE INC.
+FORM 10-K ANNUAL REPORT — FISCAL YEAR 2023
+(Excerpted for demonstration purposes from public SEC filing)
+
+FINANCIAL HIGHLIGHTS
+
+Net sales: $383.3 billion for fiscal 2023, compared to $394.3 billion in fiscal 2022.
+Net income: $97.0 billion for fiscal 2023.
+Diluted earnings per share (EPS): $6.13 for fiscal 2023.
+Gross margin: 44.1% for fiscal 2023, compared to 43.3% in fiscal 2022.
+
+SEGMENT RESULTS
+
+Products revenue: $298.1 billion (fiscal 2023)
+  - iPhone: $200.6 billion
+  - Mac: $29.4 billion
+  - iPad: $28.3 billion
+  - Wearables, Home and Accessories: $39.8 billion
+
+Services revenue: $85.2 billion (fiscal 2023), up 9% year-over-year
+  - App Store, iCloud, Apple Music, Apple TV+, Apple Pay and other services
+
+BALANCE SHEET HIGHLIGHTS (as of September 30, 2023)
+
+Total assets: $352.6 billion
+Cash and cash equivalents: $29.9 billion
+Marketable securities: $31.6 billion
+Total cash and investments: $162.1 billion
+Total debt: $111.1 billion (long-term)
+Shareholders' equity: $62.1 billion
+
+CASH FLOW
+
+Operating cash flow: $114.0 billion
+Capital expenditures: $10.7 billion
+Free cash flow: $103.3 billion
+Share repurchases: $77.6 billion
+Dividends paid: $15.1 billion
+
+GEOGRAPHIC BREAKDOWN
+
+Americas: $162.1 billion revenue
+Europe: $94.3 billion revenue
+Greater China: $72.6 billion revenue
+Japan: $24.3 billion revenue
+Rest of Asia Pacific: $29.6 billion revenue
+
+RISK FACTORS
+
+The Company faces intense competition in all its markets. Competitors with greater financial
+resources, lower prices, or more established brands could adversely affect the Company's business.
+The Company is subject to risks related to global supply chain disruptions, geopolitical tensions
+particularly between the U.S. and China, and macroeconomic conditions including inflation and
+foreign currency fluctuations.
+
+RESEARCH AND DEVELOPMENT
+
+Research and development expense: $29.9 billion in fiscal 2023
+The Company continues to invest heavily in silicon design, machine learning, augmented reality,
+and health-related technologies through its custom chip program (Apple Silicon).
+
+CAPITAL ALLOCATION STRATEGY
+
+Apple has returned over $600 billion to shareholders since initiating its capital return program.
+The Board of Directors has authorized an additional $90 billion in share repurchases as of
+May 2023. The Company's goal is to become net-cash neutral over time.

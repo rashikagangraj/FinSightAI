@@ -1,0 +1,70 @@
+TESLA, INC.
+Q4 AND FULL YEAR 2023 EARNINGS CALL TRANSCRIPT
+(Excerpted from public investor relations materials)
+
+FULL YEAR 2023 FINANCIAL RESULTS
+
+Total revenue: $97.7 billion, up 19% year-over-year
+Automotive revenue: $82.4 billion
+Energy generation and storage revenue: $6.0 billion
+Services and other revenue: $8.3 billion
+
+Net income (GAAP): $15.0 billion
+Net income margin: 15.3%
+Adjusted EBITDA: $14.0 billion
+Adjusted EBITDA margin: 14.3%
+
+Earnings per share (diluted, GAAP): $4.30
+Free cash flow: $4.4 billion
+Cash and cash equivalents: $29.1 billion
+
+GROSS MARGIN
+
+Automotive gross margin: 18.9% (Q4 2023), down from 25.9% in Q4 2022
+The decline reflects strategic price reductions to maintain volume and market share,
+increased depreciation of Gigafactory assets, and cost headwinds from ramping new models.
+
+Total company gross margin: 17.6% (Q4 2023)
+
+DELIVERIES AND PRODUCTION
+
+Total deliveries in 2023: 1,808,581 vehicles, up 38% year-over-year
+  - Model 3/Y: 1,739,707 deliveries
+  - Model S/X/Cybertruck: 68,874 deliveries
+
+Total production: 1,845,985 vehicles
+
+ENERGY BUSINESS
+
+Energy storage deployed: 14.7 GWh in 2023, a record high
+Megapack revenue grew significantly, with strong demand from utility-scale storage projects
+Solar deployments: 2.5 GW
+
+BALANCE SHEET (December 31, 2023)
+
+Total assets: $106.6 billion
+Total debt: $5.2 billion
+Shareholders' equity: $62.6 billion
+
+OPERATING EXPENSES
+
+Research and development: $3.97 billion in 2023
+Selling, general and administrative: $4.80 billion in 2023
+
+GUIDANCE AND FORWARD OUTLOOK
+
+Management noted that 2024 growth rate may be notably lower than 2023 due to:
+- The company is between two major growth waves
+- Higher interest rates reducing consumer purchasing power
+- Competitive pricing pressures from Chinese automakers
+- Investment in next-generation vehicle platform and AI/autonomous driving
+
+Tesla expects to launch its next-generation vehicle (Cybercab robotaxi) and continue
+scaling Autopilot and Full Self-Driving (FSD) capabilities. The FSD price was reduced
+from $15,000 to $12,000 in the United States to accelerate adoption.
+
+SUPERCHARGER NETWORK
+
+Number of Supercharger stations: 5,952 globally
+Connector opens to other EV brands (Ford, GM, Rivian partnerships announced)
+This generates incremental revenue and positions Tesla's NACS connector as the industry standard.

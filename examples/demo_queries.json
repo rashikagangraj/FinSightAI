@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "category": "simple_qa",
+    "query": "What was Apple's total revenue in fiscal year 2023?",
+    "expected_keywords": ["383.3 billion", "383", "revenue"]
+  },
+  {
+    "id": 2,
+    "category": "simple_qa",
+    "query": "How many vehicles did Tesla deliver in 2023?",
+    "expected_keywords": ["1,808,581", "1.8 million", "deliveries"]
+  },
+  {
+    "id": 3,
+    "category": "deep_analysis",
+    "query": "Calculate Apple's price-to-earnings ratio given a share price of $190 and EPS of $6.13",
+    "expected_keywords": ["P/E", "ratio", "30", "31"]
+  },
+  {
+    "id": 4,
+    "category": "deep_analysis",
+    "query": "What is Apple's free cash flow margin based on their fiscal 2023 results?",
+    "expected_keywords": ["free cash flow", "103.3 billion", "margin", "26%", "27%"]
+  },
+  {
+    "id": 5,
+    "category": "comparison",
+    "query": "Compare Apple and Tesla's gross margin performance in 2023",
+    "expected_keywords": ["Apple", "Tesla", "gross margin", "44.1%", "17.6%"]
+  },
+  {
+    "id": 6,
+    "category": "comparison",
+    "query": "Which company has more cash on hand — Apple or Tesla?",
+    "expected_keywords": ["Apple", "Tesla", "cash", "29.9 billion", "29.1 billion"]
+  },
+  {
+    "id": 7,
+    "category": "report",
+    "query": "Generate a financial analysis report comparing Apple and Tesla as investment opportunities",
+    "expected_keywords": ["Executive Summary", "Key Financial Metrics", "Analysis", "Apple", "Tesla"]
+  },
+  {
+    "id": 8,
+    "category": "simple_qa",
+    "query": "What sector performed best in the S&P 500 in 2023?",
+    "expected_keywords": ["Information Technology", "57.8%", "AI"]
+  },
+  {
+    "id": 9,
+    "category": "deep_analysis",
+    "query": "What are the main risks facing Tesla's business according to their earnings call?",
+    "expected_keywords": ["interest rates", "Chinese", "competition", "margin", "growth"]
+  },
+  {
+    "id": 10,
+    "category": "simple_qa",
+    "query": "How much did Apple spend on research and development in 2023?",
+    "expected_keywords": ["29.9 billion", "R&D", "research", "development"]
+  }
+]
