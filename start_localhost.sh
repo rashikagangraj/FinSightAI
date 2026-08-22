@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 echo "========================================================"
-echo "  FinAgent RAG - Financial Intelligence Local Server"
+echo "  FinSight AI - Financial Intelligence Agent"
+echo "  Turn financial documents into business decisions."
 echo "========================================================"
 echo ""
 
@@ -10,5 +11,6 @@ else
     PYTHON_CMD="python3"
 fi
 
-echo "Starting FinAgent server on http://localhost:8000 ..."
+echo "Starting FinSight AI server on http://localhost:8000 ..."
+
 $PYTHON_CMD run_server.py

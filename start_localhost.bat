@@ -1,7 +1,8 @@
 @echo off
-title FinAgent RAG — Local Host
+title FinSight AI — Financial Intelligence Agent
 echo ========================================================
-echo   FinAgent RAG - Financial Intelligence Local Server
+echo   FinSight AI - Financial Intelligence Agent
+echo   Turn financial documents into business decisions.
 echo ========================================================
 echo.
 
@@ -13,7 +14,8 @@ IF EXIST "venv\Scripts\python.exe" (
     set PYTHON_CMD=python
 )
 
-echo Starting FinAgent server on http://localhost:8000 ...
+echo Starting FinSight AI server on http://localhost:8000 ...
+
 echo Opening default web browser...
 start http://localhost:8000
 

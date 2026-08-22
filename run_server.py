@@ -1,5 +1,5 @@
 """
-FinAgent RAG — Local Server Runner
+FinSight AI — Local Server Runner
 -----------------------------------
 Run:
     python run_server.py
@@ -28,7 +28,8 @@ def main():
 
     console.print(
         Panel.fit(
-            "[bold cyan]FinAgent RAG - Financial Document Intelligence[/bold cyan]\n"
+            "[bold cyan]FinSight AI - Financial Intelligence Agent[/bold cyan]\n"
+            "[italic white]Turn financial documents into business decisions.[/italic white]\n\n"
             f"[dim]LLM Backend:[/dim] [green]{cfg.llm_backend.upper()}[/green]  "
             f"[dim]Model:[/dim] [yellow]{cfg.active_model}[/yellow]  "
             f"[dim]Embeddings:[/dim] [yellow]{cfg.active_embed_model}[/yellow]\n"
@@ -39,6 +40,7 @@ def main():
             border_style="cyan",
         )
     )
+
 
     doc_count = get_document_count()
     if doc_count == 0:

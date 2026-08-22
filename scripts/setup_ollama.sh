@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# FinAgent — Ollama model setup script
+# FinSight AI — Ollama model setup script
 # Run: bash scripts/setup_ollama.sh
 
 set -e
 
 echo "=================================================="
-echo " FinAgent RAG — Ollama Model Setup"
+echo " FinSight AI — Financial Intelligence Agent"
+echo " Turn financial documents into business decisions."
 echo "=================================================="
+
 
 # Check if ollama is installed
 if ! command -v ollama &> /dev/null; then

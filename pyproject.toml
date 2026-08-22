@@ -3,16 +3,18 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.backends.legacy:build"
 
 [project]
-name = "finagent-rag"
+name = "finsight-ai"
 version = "0.1.0"
-description = "Agentic RAG for Financial Document Intelligence"
+description = "FinSight AI — Financial Intelligence Agent. Turn financial documents into business decisions."
 authors = [{ name = "Your Name", email = "you@example.com" }]
 requires-python = ">=3.10"
 readme = "README.md"
 license = { text = "MIT" }
 
 [project.scripts]
+finsight = "src.api.main:run"
 finagent = "src.api.main:run"
+
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

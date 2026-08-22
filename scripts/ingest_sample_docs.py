@@ -22,8 +22,9 @@ SAMPLE_DOCS_DIR = Path(__file__).parent.parent / "examples" / "sample_docs"
 
 
 def main() -> None:
-    console.print("\n[bold cyan]FinAgent — Ingesting Sample Financial Documents[/bold cyan]\n")
+    console.print("\n[bold cyan]FinSight AI — Ingesting Sample Financial Documents[/bold cyan]\n")
     reset_collection()
+
 
 
     files = list(SAMPLE_DOCS_DIR.iterdir())

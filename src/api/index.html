@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinAgent RAG — Financial Document Intelligence Dashboard</title>
+    <title>FinSight AI — Financial Intelligence Agent</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -932,8 +932,8 @@
                 <i data-lucide="trending-up" style="color: white; width: 20px; height: 20px;"></i>
             </div>
             <div>
-                <span class="logo-text">FinAgent RAG</span>
-                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: -3px;">Financial Intelligence Engine</span>
+                <span class="logo-text">FinSight AI</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: -3px;">Financial Intelligence Agent</span>
             </div>
         </div>
 
@@ -1049,12 +1049,12 @@
                     <div class="chat-messages" id="chat-messages">
                         <div class="message bot">
                             <div class="message-bubble">
-                                Welcome to <strong>FinAgent RAG</strong>. I am your autonomous financial intelligence agent.
+                                Welcome to <strong>FinSight AI</strong>. <em>Turn financial documents into business decisions.</em>
                                 <br><br>
-                                You can upload financial reports, 10-Ks, or earnings transcripts on the sidebar, or click <strong>"Seed Sample Docs"</strong> to start testing immediately with Apple, Tesla, and S&P 500 reports!
+                                You can upload financial reports, 10-Ks, or earnings transcripts on the sidebar, or click <strong>"Seed Sample Docs"</strong> to start testing immediately with AIKART, Apple, Tesla, and S&P 500 reports!
                             </div>
                             <div class="message-metadata">
-                                <span>FinAgent System</span>
+                                <span>FinSight AI System</span>
                                 <span class="intent-badge">READY</span>
                             </div>
                         </div>
@@ -1626,7 +1626,7 @@
                 showToast('No chat history to export', 'info');
                 return;
             }
-            let md = `# FinAgent Financial Intelligence Analysis Report\nGenerated: ${new Date().toLocaleString()}\n\n---\n\n`;
+            let md = `# FinSight AI — Financial Intelligence Analysis Report\nTagline: Turn financial documents into business decisions.\nGenerated: ${new Date().toLocaleString()}\n\n---\n\n`;
             chatHistory.forEach(item => {
                 md += `### Query: ${item.query}\n\n**Answer:**\n${item.answer}\n\n`;
                 if (item.sources && item.sources.length) {
@@ -1639,13 +1639,13 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `finagent_analysis_${Date.now()}.md`;
+            a.download = `finsight_ai_analysis_${Date.now()}.md`;
             a.click();
             URL.revokeObjectURL(url);
             showToast('Chat exported to Markdown file', 'success');
         }
 
-        // Submit query to FinAgent
+        // Submit query to FinSight AI
         async function submitQuery() {
             const queryText = chatInput.value.trim();
             if (queryText.length < 3) return;
@@ -1758,7 +1758,7 @@
                     </div>
                     <div class="message-metadata">
                         <span style="display: flex; align-items: center; gap: 0.4rem;">
-                            <span>FinAgent</span>
+                            <span>FinSight AI</span>
                             <span class="intent-badge">${data.intent}</span>
                         </span>
                         <button class="copy-msg-btn" onclick="copyText(this, \`${data.answer.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
@@ -1798,7 +1798,7 @@
             
             const meta = document.createElement('div');
             meta.className = 'message-metadata';
-            meta.innerHTML = `<span>FinAgent Stream</span><span class="intent-badge">STREAM</span>`;
+            meta.innerHTML = `<span>FinSight AI Stream</span><span class="intent-badge">STREAM</span>`;
             
             botMsgDiv.appendChild(bubble);
             botMsgDiv.appendChild(meta);

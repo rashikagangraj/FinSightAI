@@ -1,6 +1,6 @@
 """
-FinAgent CLI Demo
------------------
+FinSight AI CLI Demo
+--------------------
 Run: python examples/demo_cli.py
 
 Make sure to ingest sample docs first:
@@ -24,7 +24,7 @@ from rich.table import Table
 from src.agents.graph import run_agent
 from src.core.logging import setup_logging
 
-app = typer.Typer(help="FinAgent RAG — Financial Document Intelligence Demo")
+app = typer.Typer(help="FinSight AI — Financial Intelligence Agent")
 console = Console()
 
 DEMO_QUERIES = [
@@ -40,7 +40,8 @@ def ask(
     query: str = typer.Argument(..., help="Financial question to ask"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show agent trace"),
 ):
-    """Ask a financial question to the FinAgent."""
+    """Ask a financial question to FinSight AI."""
+
     setup_logging("INFO")
     console.print(Panel(f"[bold cyan]Query:[/bold cyan] {query}", expand=False))
 

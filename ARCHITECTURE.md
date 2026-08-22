@@ -1,4 +1,6 @@
-# FinAgent RAG — Architecture
+# FinSight AI — Architecture
+### Financial Intelligence Agent
+*Turn financial documents into business decisions.*
 
 ## System Overview
 

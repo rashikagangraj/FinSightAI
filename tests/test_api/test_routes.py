@@ -23,15 +23,16 @@ def test_health_endpoint():
 def test_root_endpoint():
     response = client.get("/")
     assert response.status_code == 200
-    assert "FinAgent" in response.text
+    assert "FinSight AI" in response.text
 
 
 def test_api_info_endpoint():
     response = client.get("/api/info")
     assert response.status_code == 200
     data = response.json()
-    assert "FinAgent" in data["name"]
+    assert "FinSight AI" in data["name"]
     assert "endpoints" in data
+
 
 
 def test_list_documents_empty():

@@ -1,10 +1,10 @@
 <div align="center">
 
-# FinAgent RAG
+# FinSight AI
 
-### Autonomous AI Agents for Financial Document Intelligence
+### Financial Intelligence Agent
 
-*Upload financial reports. Ask complex questions. Get cited, structured answers.*
+*Turn financial documents into business decisions.*
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![LangGraph](https://img.shields.io/badge/LangGraph-0.2%2B-FF6B35?style=for-the-badge)](https://github.com/langchain-ai/langgraph)
@@ -27,13 +27,14 @@
 
 ## Overview
 
-**FinAgent RAG** is a production-grade agentic workflow system that combines **Retrieval-Augmented Generation (RAG)** with **autonomous multi-agent orchestration** to analyze financial documents.
+**FinSight AI** is a production-grade financial intelligence agent that combines **Retrieval-Augmented Generation (RAG)** with **autonomous multi-agent orchestration** to analyze financial documents.
 
-Unlike simple chatbots, FinAgent uses a **LangGraph state machine** to plan its approach, route to the right analysis strategy, and synthesize answers with source citations — all powered by your choice of **OpenAI GPT-4o** (cloud) or **Ollama** (free, runs on CPU with no GPU required).
+Unlike simple chatbots, FinSight AI uses a **LangGraph state machine** to plan its approach, route to the right analysis strategy, and synthesize answers with source citations — all powered by your choice of **OpenAI GPT-4o** (cloud) or **Ollama** (free, runs on CPU with no GPU required).
 
 ### The Problem It Solves
 
-Financial professionals spend hours manually reading through 10-K filings, earnings transcripts, and market reports to answer questions that an AI can answer in seconds. FinAgent automates:
+Financial professionals spend hours manually reading through 10-K filings, earnings transcripts, and market reports to answer questions that an AI can answer in seconds. FinSight AI automates:
+
 
 - **Document Q&A** — "What was Apple's revenue in FY2023?"
 - **Financial analysis** — "Calculate Apple's P/E ratio and free cash flow margin"
@@ -229,8 +230,8 @@ Response: "Apple's free cash flow margin for FY2023 was 26.9%,
 
 **Step 1: Clone the repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/finagent-rag.git
-cd finagent-rag
+git clone https://github.com/YOUR_USERNAME/finsight-ai.git
+cd finsight-ai
 ```
 
 **Step 2: Create a virtual environment and install dependencies**
@@ -273,7 +274,7 @@ python scripts/ingest_sample_docs.py
 
 Expected output:
 ```
-FinAgent — Ingesting Sample Financial Documents
+FinSight AI — Ingesting Sample Financial Documents
 
  Ingestion Results
 ┌─────────────────────────────┬───────────────┬────────┐
@@ -562,7 +563,7 @@ OPENAI_API_KEY=sk-...
 ## Project Structure
 
 ```
-finagent-rag/
+finsight-ai/
 │
 ├── src/                              # All application source code
 │   ├── core/
@@ -667,7 +668,7 @@ pytest tests/ --cov=src --cov-report=html
 
 ### 1. Hybrid Search (RAG Layer)
 
-Standard RAG uses only vector similarity search, which fails for exact number lookups (e.g., "What was revenue in Q3?" — the word "Q3" may not be similar to other Q3 mentions). FinAgent uses **hybrid retrieval**:
+Standard RAG uses only vector similarity search, which fails for exact number lookups (e.g., "What was revenue in Q3?" — the word "Q3" may not be similar to other Q3 mentions). FinSight AI uses **hybrid retrieval**:
 
 ```
 Query: "Apple Q4 2023 revenue"

@@ -1,8 +1,9 @@
-from __future__ import annotations
+from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 
 from src.api.routes.documents import router as documents_router
 from src.api.routes.query import router as query_router
@@ -18,9 +19,9 @@ logger = get_logger(__name__)
 def create_app() -> FastAPI:
     cfg = get_settings()
     app = FastAPI(
-        title="FinAgent RAG API",
+        title="FinSight AI API",
         description=(
-            "Agentic RAG system for financial document intelligence. "
+            "Financial Intelligence Agent — Turn financial documents into business decisions. "
             "Supports OpenAI and local Ollama backends."
         ),
         version="0.1.0",
@@ -52,39 +53,40 @@ def create_app() -> FastAPI:
     @app.get("/api/info", tags=["system"])
     async def api_info():
         return {
-            "name": "FinAgent RAG API",
+            "name": "FinSight AI API",
+            "subtitle": "Financial Intelligence Agent",
+            "tagline": "Turn financial documents into business decisions.",
             "version": "0.1.0",
             "status": "online",
             "llm_backend": cfg.llm_backend,
             "model": cfg.active_model,
             "embed_model": cfg.active_embed_model,
             "document_chunks": get_document_count(),
-            "endpoints": [
-                "/health",
-                "/api/info",
-                "/documents/",
-                "/documents/ingest",
-                "/documents/{source_name}",
-                "/documents/clear",
-                "/documents/seed-samples",
-                "/query/",
-                "/query/ratio",
-                "/query/stream",
-                "/docs",
-            ],
+            "endpoints": {
+                "health": "/health",
+                "info": "/api/info",
+                "query": "/query/",
+                "query_stream": "/query/stream",
+                "ratio": "/query/ratio",
+                "documents": "/documents/",
+                "upload": "/documents/upload",
+                "seed": "/documents/seed",
+                "docs": "/docs",
+            },
         }
 
-    @app.get("/", tags=["system"])
-    async def root():
-        import os
-        from fastapi.responses import HTMLResponse
-        html_path = os.path.join(os.path.dirname(__file__), "index.html")
-        if os.path.exists(html_path):
-            with open(html_path, "r", encoding="utf-8") as f:
-                return HTMLResponse(content=f.read())
-        return HTMLResponse(content="<h1>FinAgent API is running</h1>")
+    # Serve Static Dashboard at Root
+    static_html_path = Path(__file__).parent / "index.html"
+    if static_html_path.exists():
+        @app.get("/", response_class=HTMLResponse, include_in_schema=False)
+        async def serve_dashboard():
+            return HTMLResponse(content=static_html_path.read_text(encoding="utf-8"))
+    else:
+        @app.get("/", response_class=HTMLResponse, include_in_schema=False)
+        async def serve_fallback():
+            return HTMLResponse(content="<h1>FinSight AI API is running</h1>")
 
-    logger.info(f"FinAgent API ready | backend={cfg.llm_backend} model={cfg.active_model}")
+    logger.info(f"FinSight AI API ready | backend={cfg.llm_backend} model={cfg.active_model}")
     return app
 
 
