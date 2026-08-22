@@ -23,7 +23,15 @@ def test_health_endpoint():
 def test_root_endpoint():
     response = client.get("/")
     assert response.status_code == 200
-    assert "FinAgent" in response.json()["name"]
+    assert "FinAgent" in response.text
+
+
+def test_api_info_endpoint():
+    response = client.get("/api/info")
+    assert response.status_code == 200
+    data = response.json()
+    assert "FinAgent" in data["name"]
+    assert "endpoints" in data
 
 
 def test_list_documents_empty():
@@ -57,6 +65,32 @@ def test_ingest_unsupported_file_type():
     assert "Unsupported" in response.json()["detail"]
 
 
+@patch("src.rag.indexer.delete_source")
+def test_delete_document(mock_delete):
+    mock_delete.return_value = 3
+    response = client.delete("/documents/test_file.txt")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["deleted_chunks"] == 3
+
+
+@patch("src.rag.indexer.clear_all_documents")
+def test_clear_documents(mock_clear):
+    mock_clear.return_value = 10
+    response = client.post("/documents/clear")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["cleared_chunks"] == 10
+
+
+def test_calculate_ratio():
+    response = client.post("/query/ratio", json={"numerator": 100.0, "denominator": 50.0, "ratio_name": "P/E"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["value"] == 2.0
+    assert data["ratio_name"] == "P/E"
+
+
 @patch("src.api.routes.query.get_document_count")
 @patch("src.api.routes.query.run_agent")
 def test_query_endpoint(mock_run_agent, mock_count):
@@ -81,3 +115,4 @@ def test_query_fails_when_no_docs(mock_count):
     response = client.post("/query/", json={"query": "What was Apple revenue?"})
     assert response.status_code == 400
     assert "No documents" in response.json()["detail"]
+

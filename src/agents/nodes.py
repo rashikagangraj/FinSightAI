@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 import json
+import re
 
 from src.agents.state import AgentState
 from src.agents.tools import (
+    calculate_altman_z_score,
+    calculate_dupont_roe,
+    calculate_fcf_margin,
     calculate_financial_ratio,
-    compare_companies,
+    compare_entities_detailed,
+    extract_comparison_entities_and_metric,
+    extract_entity_metric_value,
     extract_key_metrics,
+    format_comparison_markdown,
     search_documents,
 )
 from src.core.logging import get_logger
@@ -22,35 +29,40 @@ _SYSTEM_FINANCE = (
 )
 
 
+def _classify_intent_rules(query: str) -> str:
+    """Deterministic intent classification based on query keywords and entity count."""
+    lower_q = query.lower()
+    entities = [e for e in ["aikart", "apple", "tesla", "sp500", "s&p 500", "s&p"] if e in lower_q]
+    
+    # 1. Comparison requires comparison keywords AND (multiple entities or explicit comparison query)
+    has_compare = any(k in lower_q for k in ["compare", "comparison", "versus", "vs.", " vs ", "differ", "difference between", "difference in", "difference"])
+    if has_compare and (len(entities) >= 2 or " and " in lower_q or " vs " in lower_q or "with" in lower_q or "between" in lower_q):
+        return "comparison"
+    
+    # 2. Calculation / deep analysis
+    calc_keywords = [
+        "calculate", "compute", "fcf", "free cash flow", "roa", "roe", "d/e", "debt to equity",
+        "debt-to-equity", "dupont", "altman", "z-score", "ratio", "margin calculation", "p/e",
+        "wacc", "valuation", "dcf",
+    ]
+    if any(k in lower_q for k in calc_keywords) or ("margin" in lower_q and not has_compare and "what" not in lower_q):
+        return "deep_analysis"
+    
+    # 3. Structured report
+    if any(k in lower_q for k in ["generate a report", "create a report", "financial report", "executive summary", "comprehensive overview", "full report"]):
+        return "report"
+    
+    # 4. Single-company or single-metric questions default to simple_qa
+    return "simple_qa"
+
+
 def planner_node(state: AgentState) -> AgentState:
     """Classify the query intent and write a short retrieval plan."""
-    llm = get_llm_client()
     query = state["query"]
 
-    prompt = f"""Classify this financial query into exactly ONE of these intents:
-- simple_qa: a direct factual question (e.g. "What was Apple's revenue in 2023?")
-- deep_analysis: requires calculation or multi-step reasoning (e.g. "Calculate P/E ratio")
-- comparison: comparing two companies or time periods (e.g. "Compare Apple vs Tesla margins")
-- report: request for a structured summary or report
-
-Query: {query}
-
-Respond with ONLY a JSON object like:
-{{"intent": "<one of the above>", "search_queries": ["<query1>", "<query2>"]}}
-"""
-    try:
-        raw = llm.complete(prompt, system=_SYSTEM_FINANCE)
-        # Extract JSON from response
-        json_match = raw[raw.find("{") : raw.rfind("}") + 1]
-        parsed = json.loads(json_match)
-        intent = parsed.get("intent", "simple_qa")
-        search_queries = parsed.get("search_queries", [query])
-    except Exception as exc:
-        logger.warning(f"Planner JSON parse failed: {exc} — defaulting to simple_qa")
-        intent = "simple_qa"
-        search_queries = [query]
-
-    plan = f"Intent: {intent}\nSearch queries: {search_queries}"
+    # Rule-based deterministic intent check
+    intent = _classify_intent_rules(query)
+    plan = f"Intent: {intent}\nSearch queries: {[query]}"
     logger.info(f"[planner] intent={intent}")
     return {
         **state,
@@ -58,6 +70,8 @@ Respond with ONLY a JSON object like:
         "plan": plan,
         "agent_trace": [f"[planner] classified as '{intent}'"],
     }
+
+
 
 
 def retrieval_node(state: AgentState) -> AgentState:
@@ -87,7 +101,7 @@ def retrieval_node(state: AgentState) -> AgentState:
 
 
 def qa_node(state: AgentState) -> AgentState:
-    """Answer the query from retrieved context."""
+    """Answer the query from retrieved context with exact numerical extraction."""
     llm = get_llm_client()
     query = state["query"]
     chunks = state.get("retrieved_chunks", [])
@@ -104,7 +118,8 @@ def qa_node(state: AgentState) -> AgentState:
     )
 
     prompt = f"""Answer the following question using ONLY the provided context.
-Include specific numbers and cite the source document.
+Provide the exact numerical value, metric, and cite the source document.
+Do NOT give generic or theoretical responses when exact numbers are present in the text.
 
 Context:
 {context}
@@ -122,12 +137,50 @@ Answer:"""
     }
 
 
+
 def analysis_node(state: AgentState) -> AgentState:
     """Extract metrics and perform financial calculations."""
     llm = get_llm_client()
     query = state["query"]
     chunks = state.get("retrieved_chunks", [])
     combined_text = " ".join(c["text"] for c in chunks)
+    lower_q = query.lower()
+
+    # Identify entity name
+    ent_match = re.search(r"\b(AIKART|Tesla|Apple|Reliance)\b", query, re.I)
+    entity_name = ent_match.group(1).title() if ent_match else ("AIKART" if "aikart" in lower_q else "")
+    if entity_name.upper() == "AIKART":
+        entity_name = "AIKART"
+
+    # 1. FCF Margin Calculation
+    if "fcf" in lower_q or "free cash flow" in lower_q:
+        data_fcf = extract_entity_metric_value(chunks, entity_name, "free_cash_flow")
+        data_rev = extract_entity_metric_value(chunks, entity_name, "revenue")
+
+        fcf_val = data_fcf["raw_num"] if data_fcf else None
+        rev_val = data_rev["raw_num"] if data_rev else None
+        source_doc = (
+            data_fcf["source"]
+            if (data_fcf and data_fcf.get("source"))
+            else (data_rev["source"] if (data_rev and data_rev.get("source")) else (chunks[0]["source"] if chunks else "financial report"))
+        )
+
+        if fcf_val is not None and rev_val is not None and rev_val > 0:
+            try:
+                fcf_res = calculate_fcf_margin(fcf_val, rev_val, entity_name)
+                margin = fcf_res["fcf_margin_pct"]
+                answer = f"{entity_name}'s FCF margin is approximately {margin}%.\n\nSource: {source_doc}"
+                return {
+                    **state,
+                    "analysis": f"FCF: {fcf_val}, Revenue: {rev_val}, FCF Margin: {margin}%",
+                    "answer": answer,
+                    "sources": [source_doc],
+                    "agent_trace": [f"[analysis] calculated FCF margin = {margin}%"],
+                }
+            except Exception as exc:
+                logger.warning(f"FCF margin calculation error: {exc}")
+
+
 
     metrics = extract_key_metrics(combined_text)
 
@@ -165,42 +218,63 @@ Analytical response:"""
     }
 
 
+
 def comparison_node(state: AgentState) -> AgentState:
-    """Compare two entities by extracting and contrasting their metrics."""
+    """Compare two entities by extracting, validating, and contrasting their metrics."""
     llm = get_llm_client()
     query = state["query"]
     chunks = state.get("retrieved_chunks", [])
 
-    # Split chunks by source company
-    source_texts: dict[str, str] = {}
-    for chunk in chunks:
-        src = chunk.get("source", "unknown")
-        source_texts[src] = source_texts.get(src, "") + " " + chunk["text"]
+    # 1. Extract entities and target metric from query
+    info = extract_comparison_entities_and_metric(query)
+    entities = info["entities"]
+    metric = info["metric"]
+    metric_label = info["metric_label"]
 
-    all_text = " ".join(source_texts.values())
-    metrics_all = extract_key_metrics(all_text)
+    if len(entities) < 2:
+        return {
+            **state,
+            "answer": "### Comparative Analysis Error\n\n⚠️ Comparative analysis requires two or more companies or entities to compare. Please specify both companies in your query (e.g., 'Compare AIKART and Tesla revenue').",
+            "agent_trace": ["[comparison] aborted: fewer than 2 entities specified in query"],
+        }
 
-    comparison_context = json.dumps(
-        {src: extract_key_metrics(txt) for src, txt in source_texts.items()},
-        indent=2,
-        default=str,
+    entity_a, entity_b = entities[0], entities[1]
+
+    # 2. Extract verified metrics for each entity from retrieved chunks
+    data_a = extract_entity_metric_value(chunks, entity_a, metric)
+    data_b = extract_entity_metric_value(chunks, entity_b, metric)
+
+    # 3. Perform mathematical comparison & source validation (detect missing data)
+    comparison_res = compare_entities_detailed(
+        data_a=data_a,
+        data_b=data_b,
+        entity_a=entity_a,
+        entity_b=entity_b,
+        metric_name=metric,
+        metric_label=metric_label,
     )
 
-    prompt = f"""You are comparing financial entities. Use the extracted data below to answer the comparison question.
+    # 4. Generate structured markdown table and findings
+    answer = format_comparison_markdown(comparison_res)
 
-Extracted data by source:
-{comparison_context}
+    sources = []
+    if data_a and data_a.get("source"):
+        sources.append(data_a["source"])
+    if data_b and data_b.get("source"):
+        sources.append(data_b["source"])
+    if not sources:
+        sources = state.get("sources", [])
 
-Query: {query}
-
-Provide a structured side-by-side comparison with key takeaways:"""
-
-    answer = llm.complete(prompt, system=_SYSTEM_FINANCE)
     return {
         **state,
         "answer": answer,
-        "agent_trace": [f"[comparison] compared {len(source_texts)} sources"],
+        "sources": list(dict.fromkeys(sources)),
+        "agent_trace": [
+            f"[comparison] extracted {metric_label} for {entity_a} and {entity_b}",
+            f"[comparison] generated comparative financial matrix",
+        ],
     }
+
 
 
 def report_node(state: AgentState) -> AgentState:

@@ -35,6 +35,32 @@ class DocumentListResponse(BaseModel):
     total_chunks: int
 
 
+class DocumentActionResponse(BaseModel):
+    message: str
+    deleted_chunks: int | None = None
+    cleared_chunks: int | None = None
+
+
+class SeedSampleResponse(BaseModel):
+    message: str
+    seeded_files: dict[str, int]
+    total_chunks: int
+
+
+class FinancialRatioRequest(BaseModel):
+    numerator: float
+    denominator: float
+    ratio_name: str = "custom_ratio"
+
+
+class FinancialRatioResponse(BaseModel):
+    ratio_name: str
+    value: float | None = None
+    numerator: float
+    denominator: float
+    error: str | None = None
+
+
 class HealthResponse(BaseModel):
     status: str
     llm_backend: str
@@ -42,3 +68,4 @@ class HealthResponse(BaseModel):
     embed_model: str
     document_chunks: int
     version: str = "0.1.0"
+

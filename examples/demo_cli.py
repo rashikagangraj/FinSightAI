@@ -116,11 +116,12 @@ def evaluate():
             item["category"],
             item["query"][:50] + "...",
             f"{found}/{total}",
-            "[green]✓[/green]" if passed_this else "[red]✗[/red]",
+            "[green]PASS[/green]" if passed_this else "[red]FAIL[/red]",
         )
 
     console.print(table)
     console.print(f"\n[bold]Score: {passed}/{len(queries)} queries passed[/bold]")
+
 
 
 if __name__ == "__main__":

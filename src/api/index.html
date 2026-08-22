@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinAgent RAG — Financial Document Intelligence Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Marked.js (Markdown renderer) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --panel-bg: rgba(15, 23, 42, 0.75);
+            --panel-card: rgba(30, 41, 59, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(99, 102, 241, 0.4);
+            --accent-primary: #6366f1;
+            --accent-secondary: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
+            --accent-glow: rgba(99, 102, 241, 0.25);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+            --font-main: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.18) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.14) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.8) 0px, transparent 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Header */
+        header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.85rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            background: var(--accent-gradient);
+            padding: 0.55rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .logo-text {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.3rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-tab {
+            padding: 0.45rem 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            border: none;
+            background: transparent;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-tab.active {
+            color: #ffffff;
+            background: var(--accent-primary);
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-badge {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.active {
+            background-color: var(--accent-secondary);
+            box-shadow: 0 0 10px var(--accent-secondary);
+        }
+
+        .api-docs-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.4rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+        }
+
+        .api-docs-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Container Layout */
+        .main-container {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            flex-grow: 1;
+            max-width: 1700px;
+            width: 100%;
+            margin: 0 auto;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            height: calc(100vh - 75px);
+        }
+
+        /* Glass Panel */
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--shadow);
+            padding: 1.25rem;
+        }
+
+        /* Sidebar panels */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .panel-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Upload Area */
+        .upload-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 1.25rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .upload-zone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-zone:hover .upload-icon {
+            transform: translateY(-3px);
+            color: var(--accent-primary);
+        }
+
+        .upload-text {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .upload-text strong {
+            color: var(--text-main);
+        }
+
+        .upload-progress {
+            margin-top: 0.6rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-secondary);
+            display: none;
+        }
+
+        /* Quick Action Bar */
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.45rem 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .action-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: var(--accent-danger);
+            color: #fca5a5;
+        }
+
+        /* Document list */
+        .doc-list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 480px);
+            padding-right: 0.25rem;
+        }
+
+        .doc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .doc-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 0.55rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+            transition: all 0.2s ease;
+        }
+
+        .doc-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .doc-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 1;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+        }
+
+        .doc-badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+
+        .doc-del-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+        }
+
+        .doc-del-btn:hover {
+            color: var(--accent-danger);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .no-docs {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 1.5rem 0;
+            line-height: 1.4;
+        }
+
+        /* Chat Panel */
+        .chat-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .chat-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .chat-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .chat-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .mode-toggle {
+            font-size: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .mode-toggle.active {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #6ee7b7;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            max-width: 88%;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            width: 100%;
+            max-width: 95%;
+        }
+
+        .message-bubble {
+            padding: 0.95rem 1.25rem;
+            border-radius: 16px;
+            font-size: 0.92rem;
+            line-height: 1.55;
+            position: relative;
+        }
+
+        .message.user .message-bubble {
+            background: var(--accent-gradient);
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+        }
+
+        .message.bot .message-bubble {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+            color: var(--text-main);
+        }
+
+        .message-metadata {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            padding: 0 0.2rem;
+        }
+
+        .intent-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.68rem;
+        }
+
+        .copy-msg-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .copy-msg-btn:hover {
+            color: var(--text-main);
+        }
+
+        /* Agent Trace Accordion */
+        .trace-container {
+            margin-top: 0.6rem;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .trace-header {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            user-select: none;
+        }
+
+        .trace-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .trace-body {
+            display: none;
+            padding: 0.75rem;
+            border-top: 1px solid var(--border-color);
+            flex-direction: column;
+            gap: 0.4rem;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .trace-step {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: #a5b4fc;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4rem;
+        }
+
+        /* Sources */
+        .sources-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.65rem;
+            padding-top: 0.55rem;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .source-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.72rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Suggestions */
+        .suggestions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.65rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .suggestion-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.7rem 0.85rem;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .suggestion-card:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: var(--border-highlight);
+            transform: translateY(-2px);
+        }
+
+        .suggestion-title {
+            font-weight: 700;
+            color: var(--accent-primary);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .suggestion-text {
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
+
+        .suggestion-card:hover .suggestion-text {
+            color: var(--text-main);
+        }
+
+        /* Chat Input */
+        .chat-input-container {
+            position: relative;
+        }
+
+        .chat-input-wrapper {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .chat-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-family: var(--font-main);
+            font-size: 0.92rem;
+            padding: 0.6rem 0.8rem;
+            flex-grow: 1;
+            height: 42px;
+        }
+
+        .send-btn {
+            background: var(--accent-gradient);
+            border: none;
+            outline: none;
+            color: #ffffff;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Loader */
+        .agent-loader {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-secondary);
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 0.5rem 0.9rem;
+            border-radius: 8px;
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            align-self: flex-start;
+            animation: pulse 1.5s infinite ease-in-out;
+            margin-bottom: 0.75rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Markdown Overrides */
+        .markdown-content p {
+            margin-bottom: 0.65rem;
+        }
+        .markdown-content p:last-child {
+            margin-bottom: 0;
+        }
+        .markdown-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0;
+            font-size: 0.82rem;
+        }
+        .markdown-content th, .markdown-content td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+        .markdown-content th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            color: #a5b4fc;
+        }
+        .markdown-content h2, .markdown-content h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0.85rem 0 0.4rem 0;
+            color: #a5b4fc;
+        }
+        .markdown-content ul, .markdown-content ol {
+            margin: 0.4rem 0 0.65rem 1.25rem;
+        }
+        .markdown-content li {
+            margin-bottom: 0.25rem;
+        }
+        .markdown-content code {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            color: #38bdf8;
+        }
+
+        /* View Switching */
+        .view-content {
+            display: none;
+            height: 100%;
+        }
+        .view-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ratio Calculator Tool View */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .calc-card {
+            background: var(--panel-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .calc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calc-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .calc-badge {
+            font-size: 0.72rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
+
+        .calc-inputs {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .input-group label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .calc-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            outline: none;
+        }
+
+        .calc-input:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .calc-result-box {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calc-val {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-secondary);
+        }
+
+        .calc-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Header -->
+    <header>
+        <div class="logo-container" onclick="switchView('chat')">
+            <div class="logo-icon">
+                <i data-lucide="trending-up" style="color: white; width: 20px; height: 20px;"></i>
+            </div>
+            <div>
+                <span class="logo-text">FinAgent RAG</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: -3px;">Financial Intelligence Engine</span>
+            </div>
+        </div>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" id="tab-chat" onclick="switchView('chat')">
+                <i data-lucide="message-square" style="width: 15px; height: 15px;"></i>
+                Intelligence Chat
+            </button>
+            <button class="nav-tab" id="tab-calc" onclick="switchView('calc')">
+                <i data-lucide="calculator" style="width: 15px; height: 15px;"></i>
+                Financial Ratios
+            </button>
+            <button class="nav-tab" id="tab-graph" onclick="switchView('graph')">
+                <i data-lucide="git-fork" style="width: 15px; height: 15px;"></i>
+                Agent Workflow
+            </button>
+        </nav>
+
+        <div class="header-actions">
+            <div class="status-badge" title="LLM Backend Status">
+                <span class="status-dot" id="backend-status"></span>
+                <span id="backend-text">Connecting...</span>
+            </div>
+            <div class="status-badge" title="Indexed Chunks in ChromaDB">
+                <i data-lucide="database" style="width: 13px; height: 13px; color: var(--accent-secondary);"></i>
+                <span id="doc-count-text">0 chunks</span>
+            </div>
+            <a href="/docs" target="_blank" class="api-docs-btn" title="Open Swagger API documentation">
+                <i data-lucide="book-open" style="width: 14px; height: 14px;"></i>
+                API Docs
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar: Ingestion & Document Hub -->
+        <div class="sidebar">
+            <!-- Upload Panel -->
+            <div class="glass-panel">
+                <div class="panel-title">
+                    <span style="display: flex; align-items: center; gap: 0.4rem;">
+                        <i data-lucide="upload-cloud" style="width: 16px; height: 16px; color: var(--accent-primary);"></i>
+                        Document Ingestion
+                    </span>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);">PDF, TXT, MD, CSV, JSON</span>
+                </div>
+                <div class="upload-zone" id="upload-zone">
+                    <i data-lucide="file-plus" class="upload-icon" style="width: 28px; height: 28px;"></i>
+                    <div class="upload-text">
+                        <strong>Click to upload</strong> or drag & drop<br>
+                        <span style="font-size: 0.72rem; opacity: 0.7;">10-K, transcripts, reports</span>
+                    </div>
+                    <input type="file" id="file-input" accept=".pdf,.txt,.md,.csv,.json">
+                </div>
+                <div class="upload-progress" id="upload-progress">Uploading and indexing...</div>
+                
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="seedSamples()" title="Load bundled Apple, Tesla, S&P 500 reports">
+                        <i data-lucide="sparkles" style="width: 12px; height: 12px; color: var(--accent-secondary);"></i>
+                        Seed Sample Docs
+                    </button>
+                    <button class="action-btn danger" onclick="clearDocuments()" title="Delete all indexed data">
+                        <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+                        Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Documents Panel -->
+            <div class="glass-panel" style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;">
+                <div class="panel-title">
+                    <span style="display: flex; align-items: center; gap: 0.4rem;">
+                        <i data-lucide="files" style="width: 16px; height: 16px; color: var(--accent-secondary);"></i>
+                        Indexed Documents
+                    </span>
+                    <button id="refresh-docs-btn" onclick="fetchDocuments()" style="background: transparent; border: none; cursor: pointer; color: var(--text-muted);" title="Refresh list">
+                        <i data-lucide="rotate-cw" style="width: 13px; height: 13px;"></i>
+                    </button>
+                </div>
+                <div class="doc-list-container">
+                    <ul class="doc-list" id="doc-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main View Area -->
+        <div class="glass-panel" style="overflow: hidden; height: 100%;">
+            
+            <!-- View 1: Chat View -->
+            <div class="view-content active" id="view-chat">
+                <div class="chat-panel">
+                    <div class="chat-header">
+                        <div>
+                            <h2 class="chat-title">Interactive Financial Intelligence</h2>
+                            <p class="chat-subtitle" id="model-subtitle">Backend: ... | Model: ...</p>
+                        </div>
+                        <div class="chat-controls">
+                            <button class="mode-toggle" id="stream-toggle" onclick="toggleStreamingMode()" title="Toggle SSE Token Streaming vs Agent Graph Reasoning">
+                                <i data-lucide="zap" style="width: 13px; height: 13px;"></i>
+                                <span id="stream-mode-label">Mode: Agent Graph</span>
+                            </button>
+                            <button class="action-btn" onclick="exportChatMarkdown()" title="Export chat history as Markdown">
+                                <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat messages -->
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message bot">
+                            <div class="message-bubble">
+                                Welcome to <strong>FinAgent RAG</strong>. I am your autonomous financial intelligence agent.
+                                <br><br>
+                                You can upload financial reports, 10-Ks, or earnings transcripts on the sidebar, or click <strong>"Seed Sample Docs"</strong> to start testing immediately with Apple, Tesla, and S&P 500 reports!
+                            </div>
+                            <div class="message-metadata">
+                                <span>FinAgent System</span>
+                                <span class="intent-badge">READY</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="loader-container"></div>
+
+                    <!-- Suggestions -->
+                    <div class="suggestions" id="suggestions-container">
+                        <div class="suggestion-card" onclick="useSuggestion('Compare Apple and Tesla gross margins in 2023 and explain the variance')">
+                            <span class="suggestion-title">Comparison</span>
+                            <span class="suggestion-text">"Compare Apple and Tesla gross margins in 2023"</span>
+                        </div>
+                        <div class="suggestion-card" onclick="useSuggestion('Calculate Apple\'s Return on Assets (ROA) and free cash flow margin')">
+                            <span class="suggestion-title">Deep Financial Analysis</span>
+                            <span class="suggestion-text">"Calculate Apple's ROA and cash flow margin"</span>
+                        </div>
+                        <div class="suggestion-card" onclick="useSuggestion('What was Apple\'s total revenue in fiscal year 2023?')">
+                            <span class="suggestion-title">Fact Extraction</span>
+                            <span class="suggestion-text">"What was Apple's total revenue in FY2023?"</span>
+                        </div>
+                        <div class="suggestion-card" onclick="useSuggestion('Generate a structured financial summary of the S&P 500 performance in 2023')">
+                            <span class="suggestion-title">Report Generator</span>
+                            <span class="suggestion-text">"Generate financial summary of S&P 500 performance"</span>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="chat-input-container">
+                        <div class="chat-input-wrapper">
+                            <input type="text" class="chat-input" id="chat-input" placeholder="Ask a financial question, ratio calculation, or company comparison..." autocomplete="off">
+                            <button class="send-btn" id="send-btn" onclick="submitQuery()" disabled title="Submit query">
+                                <i data-lucide="send" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 2: Financial Ratio Calculator -->
+            <div class="view-content" id="view-calc">
+                <div class="chat-header">
+                    <div>
+                        <h2 class="chat-title">Financial Ratio & Valuation Sandbox</h2>
+                        <p class="chat-subtitle">Instant mathematical computation & financial benchmarking</p>
+                    </div>
+                </div>
+
+                <div class="calculator-grid">
+                    <!-- Card 1: P/E Ratio -->
+                    <div class="calc-card">
+                        <div class="calc-header">
+                            <span class="calc-title">Price-to-Earnings (P/E) Ratio</span>
+                            <span class="calc-badge">Valuation</span>
+                        </div>
+                        <div class="calc-desc">Measures company share price relative to its per-share earnings.</div>
+                        <div class="calc-inputs">
+                            <div class="input-group">
+                                <label>Stock Price ($)</label>
+                                <input type="number" class="calc-input" id="pe-price" value="180" oninput="calcPE()">
+                            </div>
+                            <div class="input-group">
+                                <label>Earnings Per Share ($)</label>
+                                <input type="number" class="calc-input" id="pe-eps" value="6.13" oninput="calcPE()">
+                            </div>
+                        </div>
+                        <div class="calc-result-box">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">P/E Ratio:</span>
+                            <span class="calc-val" id="pe-result">29.36x</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Return on Assets (ROA) -->
+                    <div class="calc-card">
+                        <div class="calc-header">
+                            <span class="calc-title">Return on Assets (ROA)</span>
+                            <span class="calc-badge">Profitability</span>
+                        </div>
+                        <div class="calc-desc">Evaluates how efficiently a company uses its assets to generate net income.</div>
+                        <div class="calc-inputs">
+                            <div class="input-group">
+                                <label>Net Income ($B)</label>
+                                <input type="number" class="calc-input" id="roa-income" value="96.99" oninput="calcROA()">
+                            </div>
+                            <div class="input-group">
+                                <label>Total Assets ($B)</label>
+                                <input type="number" class="calc-input" id="roa-assets" value="352.58" oninput="calcROA()">
+                            </div>
+                        </div>
+                        <div class="calc-result-box">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">ROA Percentage:</span>
+                            <span class="calc-val" id="roa-result">27.51%</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: 3-Stage DuPont ROE Decomposition -->
+                    <div class="calc-card">
+                        <div class="calc-header">
+                            <span class="calc-title">3-Stage DuPont ROE</span>
+                            <span class="calc-badge">Decomposition</span>
+                        </div>
+                        <div class="calc-desc">ROE = (Net Margin) × (Asset Turnover) × (Financial Leverage)</div>
+                        <div class="calc-inputs">
+                            <div class="input-group">
+                                <label>Net Margin (%)</label>
+                                <input type="number" class="calc-input" id="dp-margin" value="25.3" oninput="calcDuPont()">
+                            </div>
+                            <div class="input-group">
+                                <label>Asset Turnover</label>
+                                <input type="number" class="calc-input" id="dp-turnover" value="1.08" oninput="calcDuPont()">
+                            </div>
+                            <div class="input-group">
+                                <label>Equity Multiplier</label>
+                                <input type="number" class="calc-input" id="dp-leverage" value="5.67" oninput="calcDuPont()">
+                            </div>
+                        </div>
+                        <div class="calc-result-box">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">Decomposed ROE:</span>
+                            <span class="calc-val" id="dp-result">154.93%</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Altman Z-Score -->
+                    <div class="calc-card">
+                        <div class="calc-header">
+                            <span class="calc-title">Altman Z-Score</span>
+                            <span class="calc-badge">Credit & Solvency</span>
+                        </div>
+                        <div class="calc-desc">Predicts bankruptcy probability (Z &gt; 2.99 Safe, 1.81-2.99 Grey, &lt; 1.81 Distress).</div>
+                        <div class="calc-inputs">
+                            <div class="input-group">
+                                <label>EBIT / Assets</label>
+                                <input type="number" class="calc-input" id="z-ebit" value="0.32" oninput="calcAltman()">
+                            </div>
+                            <div class="input-group">
+                                <label>Sales / Assets</label>
+                                <input type="number" class="calc-input" id="z-sales" value="1.09" oninput="calcAltman()">
+                            </div>
+                            <div class="input-group">
+                                <label>Equity / Debt</label>
+                                <input type="number" class="calc-input" id="z-equity" value="0.56" oninput="calcAltman()">
+                            </div>
+                        </div>
+                        <div class="calc-result-box">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">Z-Score:</span>
+                            <span class="calc-val" id="z-result" style="color: var(--accent-secondary);">3.48 (Safe Zone)</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 5: Debt-to-Equity -->
+                    <div class="calc-card">
+                        <div class="calc-header">
+                            <span class="calc-title">Debt-to-Equity Ratio</span>
+                            <span class="calc-badge">Leverage</span>
+                        </div>
+                        <div class="calc-desc">Quantifies proportion of debt financing relative to shareholders' equity.</div>
+                        <div class="calc-inputs">
+                            <div class="input-group">
+                                <label>Total Debt ($B)</label>
+                                <input type="number" class="calc-input" id="de-debt" value="111.08" oninput="calcDE()">
+                            </div>
+                            <div class="input-group">
+                                <label>Shareholders Equity ($B)</label>
+                                <input type="number" class="calc-input" id="de-equity" value="62.15" oninput="calcDE()">
+                            </div>
+                        </div>
+                        <div class="calc-result-box">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">Debt / Equity:</span>
+                            <span class="calc-val" id="de-result">1.79x</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 6: Gross Margin -->
+                    <div class="calc-card">
+                        <div class="calc-header">
+                            <span class="calc-title">Gross Profit Margin</span>
+                            <span class="calc-badge">Operational Efficiency</span>
+                        </div>
+                        <div class="calc-desc">Percentage of sales retained after paying cost of goods sold (COGS).</div>
+                        <div class="calc-inputs">
+                            <div class="input-group">
+                                <label>Gross Profit ($B)</label>
+                                <input type="number" class="calc-input" id="gm-profit" value="169.15" oninput="calcGM()">
+                            </div>
+                            <div class="input-group">
+                                <label>Total Revenue ($B)</label>
+                                <input type="number" class="calc-input" id="gm-revenue" value="383.29" oninput="calcGM()">
+                            </div>
+                        </div>
+                        <div class="calc-result-box">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">Gross Margin:</span>
+                            <span class="calc-val" id="gm-result">44.13%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 3: Agent Workflow & Architecture -->
+            <div class="view-content" id="view-graph">
+                <div class="chat-header">
+                    <div>
+                        <h2 class="chat-title">LangGraph Agent State Architecture</h2>
+                        <p class="chat-subtitle">Autonomous multi-node financial reasoning pipeline</p>
+                    </div>
+                </div>
+
+                <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; padding: 1rem 0;">
+                    <div class="glass-panel" style="background: rgba(0,0,0,0.3); border-color: rgba(99,102,241,0.2);">
+                        <h3 style="color: #a5b4fc; font-size: 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="workflow" style="width: 16px; height: 16px; color: var(--accent-primary);"></i>
+                            Execution Flowchart
+                        </h3>
+                        <div style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.8; color: var(--text-muted); background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 8px;">
+                            [START: Query Input]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+                            <strong>1. Planner Node</strong> (Intent Classification: simple_qa | deep_analysis | comparison | report)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+                            <strong>2. Retrieval Node</strong> (Hybrid BM25 + ChromaDB Vector Fusion with RRF ranking)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;↓ (Conditional Intent Router)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;├──→ <strong>QA Worker</strong> (Direct ground extraction & source citations)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;├──→ <strong>Analysis Worker</strong> (Regex financial metric extractor & ratio computation)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;├──→ <strong>Comparison Worker</strong> (Side-by-side entity benchmarking matrix)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;└──→ <strong>Report Worker</strong> (Structured 5-section executive financial document)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+                            <strong>3. Output Node</strong> (Format markdown, verify source citations, generate metadata)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+                            [END: Response Delivered]
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                        <div class="calc-card">
+                            <span style="font-weight: 700; color: var(--accent-primary);">Hybrid RAG</span>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Combines semantic dense embeddings with exact full-text BM25 keyword matching for 99%+ financial ticker retrieval accuracy.</p>
+                        </div>
+                        <div class="calc-card">
+                            <span style="font-weight: 700; color: var(--accent-secondary);">Local or Cloud</span>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Supports local CPU/GPU Ollama models (Llama 3.2, Qwen 2.5, Nomic Embed) and cloud OpenAI models (GPT-4o-mini, text-embedding-3-small).</p>
+                        </div>
+                        <div class="calc-card">
+                            <span style="font-weight: 700; color: var(--accent-warning);">Traceable Auditing</span>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Every reasoning step, node execution, and retrieved document chunk is displayed in the interactive reasoning chain.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i data-lucide="info" id="toast-icon" style="width: 16px; height: 16px;"></i>
+        <span id="toast-msg">Notification</span>
+    </div>
+
+    <script>
+        // Init Lucide
+        lucide.createIcons();
+
+        // State variables
+        let backendActive = false;
+        let totalChunks = 0;
+        let isStreamingMode = false;
+        let chatHistory = [];
+
+        // Elements
+        const backendStatus = document.getElementById('backend-status');
+        const backendText = document.getElementById('backend-text');
+        const docCountText = document.getElementById('doc-count-text');
+        const fileInput = document.getElementById('file-input');
+        const uploadProgress = document.getElementById('upload-progress');
+        const docList = document.getElementById('doc-list');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const modelSubtitle = document.getElementById('model-subtitle');
+        const loaderContainer = document.getElementById('loader-container');
+        const suggestionsContainer = document.getElementById('suggestions-container');
+        const streamToggle = document.getElementById('stream-toggle');
+        const streamModeLabel = document.getElementById('stream-mode-label');
+
+        // Toast helper
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMsg.textContent = message;
+            if (type === 'success') {
+                toast.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                toastIcon.setAttribute('data-lucide', 'check-circle');
+            } else if (type === 'error') {
+                toast.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                toastIcon.setAttribute('data-lucide', 'alert-triangle');
+            } else {
+                toast.style.borderColor = 'rgba(99, 102, 241, 0.4)';
+                toastIcon.setAttribute('data-lucide', 'info');
+            }
+            lucide.createIcons();
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        // Switch Tab Views
+        function switchView(viewName) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+            
+            document.getElementById(`tab-${viewName}`).classList.add('active');
+            document.getElementById(`view-${viewName}`).classList.add('active');
+            lucide.createIcons();
+        }
+
+        // Toggle Streaming Mode
+        function toggleStreamingMode() {
+            isStreamingMode = !isStreamingMode;
+            if (isStreamingMode) {
+                streamToggle.classList.add('active');
+                streamModeLabel.textContent = 'Mode: Fast SSE Stream';
+                showToast('Switched to Fast SSE Token Streaming');
+            } else {
+                streamToggle.classList.remove('active');
+                streamModeLabel.textContent = 'Mode: Agent Graph';
+                showToast('Switched to Full LangGraph State Machine');
+            }
+        }
+
+        // Check backend health
+        async function checkHealth() {
+            try {
+                const response = await fetch('/health');
+                if (!response.ok) throw new Error('Unhealthy');
+                const data = await response.json();
+                
+                backendActive = true;
+                backendStatus.className = 'status-dot active';
+                backendText.textContent = data.llm_backend === 'openai' ? 'OpenAI Backend' : 'Ollama Local';
+                
+                modelSubtitle.textContent = `Backend: ${data.llm_backend.toUpperCase()} | Model: ${data.model} | Embed: ${data.embed_model}`;
+                
+                totalChunks = data.document_chunks;
+                updateDocCountDisplay();
+            } catch (err) {
+                backendActive = false;
+                backendStatus.className = 'status-dot';
+                backendText.textContent = 'Server Offline';
+                modelSubtitle.textContent = 'Backend connection error';
+            }
+        }
+
+        function updateDocCountDisplay() {
+            docCountText.textContent = `${totalChunks} chunk${totalChunks === 1 ? '' : 's'}`;
+            toggleSendButton();
+        }
+
+        function toggleSendButton() {
+            if (totalChunks > 0 && chatInput.value.trim().length >= 3) {
+                sendBtn.disabled = false;
+            } else {
+                sendBtn.disabled = true;
+            }
+        }
+
+        // Fetch document list
+        async function fetchDocuments() {
+            try {
+                const response = await fetch('/documents/');
+                if (!response.ok) throw new Error('Failed to fetch');
+                const data = await response.json();
+                
+                docList.innerHTML = '';
+                if (!data.sources || data.sources.length === 0) {
+                    docList.innerHTML = '<div class="no-docs">No documents indexed yet.<br>Upload a file or click <strong>Seed Sample Docs</strong> above.</div>';
+                    totalChunks = 0;
+                } else {
+                    data.sources.forEach(source => {
+                        const li = document.createElement('li');
+                        li.className = 'doc-item';
+                        
+                        let iconName = 'file-text';
+                        const lower = source.toLowerCase();
+                        if (lower.endsWith('.pdf')) iconName = 'file-text';
+                        else if (lower.endsWith('.md')) iconName = 'file-code';
+                        else if (lower.endsWith('.csv')) iconName = 'table';
+                        else if (lower.endsWith('.json')) iconName = 'file-json';
+                        
+                        li.innerHTML = `
+                            <i data-lucide="${iconName}" style="width: 14px; height: 14px; color: var(--text-muted);"></i>
+                            <span class="doc-name" title="${source}">${source}</span>
+                            <span class="doc-badge">Indexed</span>
+                            <button class="doc-del-btn" onclick="deleteDocument('${encodeURIComponent(source)}')" title="Delete ${source}">
+                                <i data-lucide="x" style="width: 13px; height: 13px;"></i>
+                            </button>
+                        `;
+                        docList.appendChild(li);
+                    });
+                    totalChunks = data.total_chunks;
+                }
+                updateDocCountDisplay();
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Error fetching documents:', err);
+                docList.innerHTML = '<div class="no-docs" style="color: #ef4444;">Error loading documents.</div>';
+            }
+        }
+
+        // Seed sample documents
+        async function seedSamples() {
+            uploadProgress.style.display = 'block';
+            uploadProgress.textContent = 'Seeding sample financial datasets...';
+            uploadProgress.style.color = 'var(--accent-primary)';
+            
+            try {
+                const response = await fetch('/documents/seed-samples', { method: 'POST' });
+                if (!response.ok) throw new Error('Failed to seed sample documents');
+                const data = await response.json();
+                
+                uploadProgress.textContent = `Seeded ${Object.keys(data.seeded_files).length} files (${data.total_chunks} total chunks)`;
+                uploadProgress.style.color = 'var(--accent-secondary)';
+                showToast('Sample documents indexed successfully!', 'success');
+                
+                await fetchDocuments();
+                setTimeout(() => { uploadProgress.style.display = 'none'; }, 4000);
+            } catch (err) {
+                uploadProgress.textContent = `Error: ${err.message}`;
+                uploadProgress.style.color = '#ef4444';
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Delete single document
+        async function deleteDocument(sourceNameEncoded) {
+            const sourceName = decodeURIComponent(sourceNameEncoded);
+            if (!confirm(`Are you sure you want to delete "${sourceName}" from the index?`)) return;
+            
+            try {
+                const response = await fetch(`/documents/${sourceNameEncoded}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Failed to delete');
+                showToast(`Deleted ${sourceName}`, 'success');
+                await fetchDocuments();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Clear all documents
+        async function clearDocuments() {
+            if (!confirm('Are you sure you want to clear all indexed documents from vector memory?')) return;
+            
+            try {
+                const response = await fetch('/documents/clear', { method: 'POST' });
+                if (!response.ok) throw new Error('Failed to clear documents');
+                showToast('All documents cleared from vector store', 'info');
+                await fetchDocuments();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // File upload handler
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            uploadProgress.style.display = 'block';
+            uploadProgress.textContent = `Uploading & parsing ${file.name}...`;
+            uploadProgress.style.color = 'var(--accent-primary)';
+            
+            try {
+                const response = await fetch('/documents/ingest', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || 'Upload failed');
+                }
+                
+                const data = await response.json();
+                uploadProgress.textContent = `Indexed ${file.name} (+${data.nodes_indexed} chunks)`;
+                uploadProgress.style.color = 'var(--accent-secondary)';
+                showToast(`Successfully indexed ${file.name}`, 'success');
+                
+                await fetchDocuments();
+                setTimeout(() => { uploadProgress.style.display = 'none'; }, 4000);
+            } catch (err) {
+                uploadProgress.textContent = `Error: ${err.message}`;
+                uploadProgress.style.color = '#ef4444';
+                showToast(err.message, 'error');
+            }
+            fileInput.value = '';
+        });
+
+        // Setup drag and drop
+        const uploadZone = document.getElementById('upload-zone');
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+            }, false);
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Chat text change listener
+        chatInput.addEventListener('input', toggleSendButton);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !sendBtn.disabled) {
+                submitQuery();
+            }
+        });
+
+        // Use suggestions
+        function useSuggestion(text) {
+            chatInput.value = text;
+            toggleSendButton();
+            submitQuery();
+        }
+
+        // Accordion toggle
+        function toggleTrace(headerElement) {
+            const body = headerElement.nextElementSibling;
+            const icon = headerElement.querySelector('.trace-icon');
+            if (body.style.display === 'flex') {
+                body.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                body.style.display = 'flex';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // Copy message content
+        function copyText(btn, text) {
+            navigator.clipboard.writeText(text);
+            btn.innerHTML = '<i data-lucide="check" style="width: 12px; height: 12px; color: var(--accent-secondary);"></i> Copied';
+            lucide.createIcons();
+            setTimeout(() => {
+                btn.innerHTML = '<i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy';
+                lucide.createIcons();
+            }, 2000);
+        }
+
+        // Export Chat to Markdown
+        function exportChatMarkdown() {
+            if (chatHistory.length === 0) {
+                showToast('No chat history to export', 'info');
+                return;
+            }
+            let md = `# FinAgent Financial Intelligence Analysis Report\nGenerated: ${new Date().toLocaleString()}\n\n---\n\n`;
+            chatHistory.forEach(item => {
+                md += `### Query: ${item.query}\n\n**Answer:**\n${item.answer}\n\n`;
+                if (item.sources && item.sources.length) {
+                    md += `**Sources:** ${item.sources.join(', ')}\n\n`;
+                }
+                md += `---\n\n`;
+            });
+
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `finagent_analysis_${Date.now()}.md`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Chat exported to Markdown file', 'success');
+        }
+
+        // Submit query to FinAgent
+        async function submitQuery() {
+            const queryText = chatInput.value.trim();
+            if (queryText.length < 3) return;
+
+            // Hide suggestions after first query
+            suggestionsContainer.style.display = 'none';
+
+            // Disable input
+            chatInput.value = '';
+            chatInput.disabled = true;
+            sendBtn.disabled = true;
+
+            // Append User message
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'message user';
+            userMsgDiv.innerHTML = `
+                <div class="message-bubble">${queryText}</div>
+                <div class="message-metadata">
+                    <span>You</span>
+                    <span>${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                </div>
+            `;
+            chatMessages.appendChild(userMsgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            if (isStreamingMode) {
+                await handleStreamingQuery(queryText);
+            } else {
+                await handleAgentGraphQuery(queryText);
+            }
+        }
+
+        // Handle Agent Graph Query
+        async function handleAgentGraphQuery(queryText) {
+            loaderContainer.innerHTML = `
+                <div class="agent-loader" id="agent-loader">
+                    <i data-lucide="loader" class="animate-spin" style="width: 14px; height: 14px; animation: spin 1s linear infinite;"></i>
+                    <span>Agent is running state machine (Planner → Retrieval → Reasoning Node → Output)...</span>
+                </div>
+            `;
+            lucide.createIcons();
+
+            try {
+                const response = await fetch('/query/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: queryText, top_k: 5 })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || 'Failed to analyze query');
+                }
+
+                const data = await response.json();
+                loaderContainer.innerHTML = '';
+
+                // Build agent trace HTML if present
+                let traceHTML = '';
+                if (data.agent_trace && data.agent_trace.length > 0) {
+                    const stepsHTML = data.agent_trace.map(step => `
+                        <div class="trace-step">
+                            <i data-lucide="check-circle-2" style="width: 12px; height: 12px; color: var(--accent-secondary); margin-top: 1px;"></i>
+                            <span>${step}</span>
+                        </div>
+                    `).join('');
+
+                    traceHTML = `
+                        <div class="trace-container">
+                            <div class="trace-header" onclick="toggleTrace(this)">
+                                <span>Agent Reasoning Chain (${data.agent_trace.length} state nodes executed)</span>
+                                <i data-lucide="chevron-down" class="trace-icon" style="width: 14px; height: 14px; transition: transform 0.2s;"></i>
+                            </div>
+                            <div class="trace-body">
+                                ${stepsHTML}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Build sources chips
+                let sourcesHTML = '';
+                if (data.sources && data.sources.length > 0) {
+                    sourcesHTML = `
+                        <div class="sources-container">
+                            ${data.sources.map(source => `
+                                <div class="source-chip">
+                                    <i data-lucide="file-text" style="width: 11px; height: 11px;"></i>
+                                    <span>${source}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                // Render answer with Marked
+                const renderedAnswer = marked.parse(data.answer);
+
+                // Save to history
+                chatHistory.push({ query: queryText, answer: data.answer, sources: data.sources });
+
+                // Append Bot response
+                const botMsgDiv = document.createElement('div');
+                botMsgDiv.className = 'message bot';
+                botMsgDiv.innerHTML = `
+                    <div class="message-bubble markdown-content">
+                        ${renderedAnswer}
+                        ${traceHTML}
+                        ${sourcesHTML}
+                    </div>
+                    <div class="message-metadata">
+                        <span style="display: flex; align-items: center; gap: 0.4rem;">
+                            <span>FinAgent</span>
+                            <span class="intent-badge">${data.intent}</span>
+                        </span>
+                        <button class="copy-msg-btn" onclick="copyText(this, \`${data.answer.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                            <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
+                        </button>
+                    </div>
+                `;
+                chatMessages.appendChild(botMsgDiv);
+                lucide.createIcons();
+
+            } catch (err) {
+                loaderContainer.innerHTML = '';
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'message bot';
+                errorDiv.innerHTML = `
+                    <div class="message-bubble" style="background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5;">
+                        <strong>Error:</strong> ${err.message}
+                    </div>
+                `;
+                chatMessages.appendChild(errorDiv);
+            } finally {
+                chatInput.disabled = false;
+                chatInput.focus();
+                toggleSendButton();
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        // Handle SSE Streaming Query
+        async function handleStreamingQuery(queryText) {
+            const botMsgDiv = document.createElement('div');
+            botMsgDiv.className = 'message bot';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble markdown-content';
+            bubble.innerHTML = '<span style="color: var(--text-muted);">Retrieving financial context & streaming tokens...</span>';
+            
+            const meta = document.createElement('div');
+            meta.className = 'message-metadata';
+            meta.innerHTML = `<span>FinAgent Stream</span><span class="intent-badge">STREAM</span>`;
+            
+            botMsgDiv.appendChild(bubble);
+            botMsgDiv.appendChild(meta);
+            chatMessages.appendChild(botMsgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            let accumulatedText = '';
+            try {
+                const response = await fetch(`/query/stream?q=${encodeURIComponent(queryText)}`);
+                if (!response.ok) throw new Error('Stream failed');
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                bubble.innerHTML = '';
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const raw = line.slice(6).trim();
+                            if (raw === '[DONE]') continue;
+                            try {
+                                const parsed = JSON.parse(raw);
+                                if (parsed.token) {
+                                    accumulatedText += parsed.token;
+                                    bubble.innerHTML = marked.parse(accumulatedText);
+                                }
+                            } catch (e) {}
+                        }
+                    }
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+
+                chatHistory.push({ query: queryText, answer: accumulatedText, sources: [] });
+            } catch (err) {
+                bubble.innerHTML = `<span style="color: #fca5a5;">Stream error: ${err.message}</span>`;
+            } finally {
+                chatInput.disabled = false;
+                chatInput.focus();
+                toggleSendButton();
+                lucide.createIcons();
+            }
+        }
+
+        // Financial Ratio Interactive Calculator Functions
+        function calcPE() {
+            const price = parseFloat(document.getElementById('pe-price').value) || 0;
+            const eps = parseFloat(document.getElementById('pe-eps').value) || 0;
+            const res = eps > 0 ? (price / eps).toFixed(2) + 'x' : 'N/A';
+            document.getElementById('pe-result').textContent = res;
+        }
+
+        function calcROA() {
+            const income = parseFloat(document.getElementById('roa-income').value) || 0;
+            const assets = parseFloat(document.getElementById('roa-assets').value) || 0;
+            const res = assets > 0 ? ((income / assets) * 100).toFixed(2) + '%' : 'N/A';
+            document.getElementById('roa-result').textContent = res;
+        }
+
+        function calcDuPont() {
+            const margin = (parseFloat(document.getElementById('dp-margin').value) || 0) / 100;
+            const turnover = parseFloat(document.getElementById('dp-turnover').value) || 0;
+            const leverage = parseFloat(document.getElementById('dp-leverage').value) || 0;
+            const roe = (margin * turnover * leverage * 100).toFixed(2) + '%';
+            document.getElementById('dp-result').textContent = roe;
+        }
+
+        function calcAltman() {
+            const ebit = parseFloat(document.getElementById('z-ebit').value) || 0;
+            const sales = parseFloat(document.getElementById('z-sales').value) || 0;
+            const equity = parseFloat(document.getElementById('z-equity').value) || 0;
+            const z = (3.3 * ebit + 0.999 * sales + 0.6 * equity + 1.2 * 0.15 + 1.4 * 0.2).toFixed(2);
+            let zone = 'Safe Zone';
+            let color = 'var(--accent-secondary)';
+            if (z < 1.81) {
+                zone = 'Distress Zone';
+                color = 'var(--accent-danger)';
+            } else if (z < 2.99) {
+                zone = 'Grey Zone';
+                color = 'var(--accent-warning)';
+            }
+            const el = document.getElementById('z-result');
+            el.textContent = `${z} (${zone})`;
+            el.style.color = color;
+        }
+
+        function calcDE() {
+            const debt = parseFloat(document.getElementById('de-debt').value) || 0;
+            const equity = parseFloat(document.getElementById('de-equity').value) || 0;
+            const res = equity > 0 ? (debt / equity).toFixed(2) + 'x' : 'N/A';
+            document.getElementById('de-result').textContent = res;
+        }
+
+        function calcGM() {
+            const profit = parseFloat(document.getElementById('gm-profit').value) || 0;
+            const revenue = parseFloat(document.getElementById('gm-revenue').value) || 0;
+            const res = revenue > 0 ? ((profit / revenue) * 100).toFixed(2) + '%' : 'N/A';
+            document.getElementById('gm-result').textContent = res;
+        }
+
+        // Add custom spin animations
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            .animate-spin {
+                animation: spin 1s linear infinite;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initial setup
+        async function init() {
+            await checkHealth();
+            await fetchDocuments();
+            setInterval(checkHealth, 15000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

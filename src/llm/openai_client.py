@@ -14,11 +14,14 @@ logger = get_logger(__name__)
 class OpenAIClient(LLMClient):
     def __init__(self) -> None:
         cfg = get_settings()
-        self._client = OpenAI(api_key=cfg.openai_api_key)
+        if not cfg.openai_api_key or cfg.openai_api_key.startswith("sk-placeholder"):
+            raise ValueError("OpenAI API key is missing or set to placeholder.")
+        self._client = OpenAI(api_key=cfg.openai_api_key, timeout=3.0)
         self._model = cfg.openai_model
         self._embed_model = cfg.openai_embed_model
         self._temperature = cfg.openai_temperature
         self._max_tokens = cfg.openai_max_tokens
+
 
     def complete(self, prompt: str, system: str = "") -> str:
         messages = []

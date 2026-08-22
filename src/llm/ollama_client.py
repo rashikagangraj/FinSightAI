@@ -14,13 +14,14 @@ logger = get_logger(__name__)
 class OllamaClient(LLMClient):
     def __init__(self) -> None:
         cfg = get_settings()
-        self._client = ollama.Client(host=cfg.ollama_base_url)
+        self._client = ollama.Client(host=cfg.ollama_base_url, timeout=2.0)
         self._model = cfg.ollama_model
         self._embed_model = cfg.ollama_embed_model
         self._options = {
             "temperature": cfg.ollama_temperature,
             "num_ctx": cfg.ollama_num_ctx,
         }
+
 
     def complete(self, prompt: str, system: str = "") -> str:
         messages = []

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -111,8 +112,96 @@ def _bm25_search(query: str, top_k: int) -> list[RetrievedChunk]:
     return chunks
 
 
+def _extract_query_entities(query: str) -> list[str]:
+    """Extract company/entity names mentioned in the query."""
+    known_entities = {
+        "aikart": "AIKART",
+        "tesla": "Tesla",
+        "apple": "Apple",
+        "sp500": "S&P 500",
+        "s&p 500": "S&P 500",
+        "s&p": "S&P 500",
+    }
+    lower_query = query.lower()
+    found = []
+    for k, v in known_entities.items():
+        if re.search(r"\b" + re.escape(k) + r"\b", lower_query):
+            if v not in found:
+                found.append(v)
+
+    # Also discover capitalized company names from query
+    words = re.findall(r"\b[A-Z][a-zA-Z0-9_\-\&]+\b", query)
+    stopwords = {
+        "Calculate", "Compute", "Compare", "Comparison", "Versus", "Vs", "What", "How", "Why",
+        "The", "And", "With", "Between", "From", "In", "Of", "Total", "Revenue", "Margin",
+        "Profit", "Income", "Cash", "Ebitda", "Assets", "Debt", "Eps", "Fiscal", "Year",
+        "Gross", "Net", "Diluted", "Operating", "Fcf", "Roe", "Roa", "D/e", "Ratio",
+        "Q1", "Q2", "Q3", "Q4", "Fy", "Fy2023", "Fy2024", "Fy2025", "Fy2026",
+    }
+    for w in words:
+        if w not in stopwords and w.title() not in stopwords and w not in found:
+            found.append(w)
+
+    return found
+
+
+def _entity_search(entity: str, top_k: int) -> list[RetrievedChunk]:
+    """Retrieve chunks specifically matching an entity via ChromaDB document and metadata filtering."""
+    collection = _get_chroma_collection()
+    chunks = []
+    seen = set()
+
+    for ent_variant in [entity.upper(), entity.title(), entity.lower()]:
+        # 1. Document content search
+        try:
+            res = collection.get(
+                where_document={"$contains": ent_variant},
+                limit=top_k * 2,
+                include=["documents", "metadatas"],
+            )
+            for doc, meta in zip(res.get("documents", []), res.get("metadatas", [])):
+                key = doc[:100]
+                if key not in seen:
+                    seen.add(key)
+                    chunks.append(
+                        RetrievedChunk(
+                            text=doc,
+                            source=(meta or {}).get("source", "unknown"),
+                            score=1.0,
+                            metadata=meta or {},
+                        )
+                    )
+        except Exception as exc:
+            logger.debug(f"Entity document search for '{ent_variant}' failed: {exc}")
+
+        # 2. Source filename metadata match
+        try:
+            all_data = collection.get(
+                limit=top_k * 5,
+                include=["documents", "metadatas"],
+            )
+            for doc, meta in zip(all_data.get("documents", []), all_data.get("metadatas", [])):
+                src = (meta or {}).get("source", "").lower()
+                if entity.lower() in src:
+                    key = doc[:100]
+                    if key not in seen:
+                        seen.add(key)
+                        chunks.append(
+                            RetrievedChunk(
+                                text=doc,
+                                source=(meta or {}).get("source", "unknown"),
+                                score=1.0,
+                                metadata=meta or {},
+                            )
+                        )
+        except Exception as exc:
+            logger.debug(f"Entity metadata search failed: {exc}")
+
+    return chunks
+
+
 def hybrid_search(query: str, top_k: int | None = None) -> list[RetrievedChunk]:
-    """Combine vector + keyword search via Reciprocal Rank Fusion."""
+    """Combine vector + keyword + entity-filtered search via Reciprocal Rank Fusion."""
     cfg = get_settings()
     k = top_k or cfg.top_k_retrieval
 
@@ -120,8 +209,42 @@ def hybrid_search(query: str, top_k: int | None = None) -> list[RetrievedChunk]:
         logger.warning("Vector store is empty — no documents indexed yet")
         return []
 
-    vector_results = _vector_search(query, k)
-    bm25_results = _bm25_search(query, k)
+    entities = _extract_query_entities(query)
+
+    # 1. Single-entity query: strictly filter and prioritize chunks for this company
+    if len(entities) == 1:
+        target_ent = entities[0]
+        entity_chunks = _entity_search(target_ent, k * 2)
+        if entity_chunks:
+            # Rank entity chunks by question keyword relevance
+            scored = []
+            q_words = [w for w in query.lower().split() if len(w) > 2]
+            for c in entity_chunks:
+                text_lower = c.text.lower()
+                keyword_hits = sum(1 for w in q_words if w in text_lower)
+                scored.append((keyword_hits, c))
+            scored.sort(key=lambda x: x[0], reverse=True)
+            return [item[1] for item in scored[:k]]
+
+    # 2. Multi-entity comparison retrieval: retrieve for each entity separately
+    if len(entities) >= 2:
+        multi_chunks = []
+        q_words = [w for w in query.lower().split() if len(w) > 2]
+        for ent in entities:
+            ent_results = _entity_search(ent, k)
+            scored = []
+            for c in ent_results:
+                text_lower = c.text.lower()
+                keyword_hits = sum(1 for w in q_words if w in text_lower)
+                scored.append((keyword_hits, c))
+            scored.sort(key=lambda x: x[0], reverse=True)
+            multi_chunks.extend([item[1] for item in scored[: max(2, k // len(entities) + 1)]])
+        if multi_chunks:
+            return multi_chunks[:k]
+
+    # 3. General hybrid search (when no specific company entity is targeted)
+    vector_results = _vector_search(query, k * 2)
+    bm25_results = _bm25_search(query, k * 2)
 
     fused = _reciprocal_rank_fusion(
         vector_results,
@@ -134,3 +257,6 @@ def hybrid_search(query: str, top_k: int | None = None) -> list[RetrievedChunk]:
 
 def get_document_count() -> int:
     return _get_chroma_collection().count()
+
+
+

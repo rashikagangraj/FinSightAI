@@ -6,6 +6,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from llama_index.core.embeddings import MockEmbedding
+
 
 @pytest.fixture(autouse=True)
 def isolate_chroma(tmp_path):
@@ -13,10 +15,8 @@ def isolate_chroma(tmp_path):
 
 
 def _make_mock_embed():
-    embed = MagicMock()
-    embed.get_text_embedding.return_value = [0.1] * 384
-    embed.get_text_embedding_batch.return_value = [[0.1] * 384]
-    return embed
+    return MockEmbedding(embed_dim=384)
+
 
 
 @patch("src.rag.indexer._get_embed_model")

@@ -13,7 +13,7 @@ from rich.console import Console
 from rich.table import Table
 
 from src.core.logging import setup_logging
-from src.rag.indexer import ingest_file, get_document_count
+from src.rag.indexer import get_document_count, ingest_file, reset_collection
 
 setup_logging("INFO")
 console = Console()
@@ -23,6 +23,8 @@ SAMPLE_DOCS_DIR = Path(__file__).parent.parent / "examples" / "sample_docs"
 
 def main() -> None:
     console.print("\n[bold cyan]FinAgent — Ingesting Sample Financial Documents[/bold cyan]\n")
+    reset_collection()
+
 
     files = list(SAMPLE_DOCS_DIR.iterdir())
     supported = {".txt", ".md", ".pdf"}
@@ -40,15 +42,16 @@ def main() -> None:
     total_nodes = 0
     for f in sorted(files):
         try:
-            nodes = ingest_file(f)
+            nodes = ingest_file(f, source_override=f.name)
             total_nodes += nodes
-            table.add_row(f.name, str(nodes), "[green]✓[/green]")
+            table.add_row(f.name, str(nodes), "[green]SUCCESS[/green]")
         except Exception as exc:
-            table.add_row(f.name, "0", f"[red]✗ {exc}[/red]")
+            table.add_row(f.name, "0", f"[red]FAIL ({exc})[/red]")
 
     console.print(table)
     console.print(f"\n[bold green]Total nodes in vector store: {get_document_count()}[/bold green]")
     console.print("\n[dim]Ready! Run: python examples/demo_cli.py demo[/dim]\n")
+
 
 
 if __name__ == "__main__":

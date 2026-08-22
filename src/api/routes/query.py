@@ -7,7 +7,13 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
 from src.agents.graph import run_agent
-from src.api.schemas import QueryRequest, QueryResponse
+from src.agents.tools import calculate_financial_ratio
+from src.api.schemas import (
+    FinancialRatioRequest,
+    FinancialRatioResponse,
+    QueryRequest,
+    QueryResponse,
+)
 from src.core.config import get_settings
 from src.core.logging import get_logger
 from src.rag.retriever import get_document_count
@@ -21,7 +27,7 @@ async def query_agent(request: QueryRequest) -> QueryResponse:
     if get_document_count() == 0:
         raise HTTPException(
             status_code=400,
-            detail="No documents indexed yet. POST a file to /documents/ingest first.",
+            detail="No documents indexed yet. Upload a document or click 'Seed Sample Data' on the dashboard first.",
         )
 
     try:
@@ -39,6 +45,17 @@ async def query_agent(request: QueryRequest) -> QueryResponse:
     except Exception as exc:
         logger.error(f"Agent error: {exc}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+@router.post("/ratio", response_model=FinancialRatioResponse)
+async def calculate_ratio(request: FinancialRatioRequest) -> FinancialRatioResponse:
+    """Safely calculate financial ratios like P/E, ROA, ROE, Margin, Debt-to-Equity."""
+    result = calculate_financial_ratio(
+        numerator=request.numerator,
+        denominator=request.denominator,
+        ratio_name=request.ratio_name,
+    )
+    return FinancialRatioResponse(**result)
 
 
 @router.get("/stream")
@@ -74,10 +91,11 @@ async def query_agent_stream(q: str) -> StreamingResponse:
         llm = get_llm_client()
         for token in llm.stream(prompt, system=system):
             yield f"data: {json.dumps({'token': token})}\n\n"
-            await asyncio.sleep(cfg.stream_chunk_delay if hasattr(cfg, 'stream_chunk_delay') else 0.02)
+            await asyncio.sleep(getattr(cfg, 'stream_chunk_delay', 0.02))
 
         sources = list({c.source for c in chunks})
         yield f"data: {json.dumps({'sources': sources})}\n\n"
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+

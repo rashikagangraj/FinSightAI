@@ -49,16 +49,44 @@ def create_app() -> FastAPI:
             document_chunks=get_document_count(),
         )
 
+    @app.get("/api/info", tags=["system"])
+    async def api_info():
+        return {
+            "name": "FinAgent RAG API",
+            "version": "0.1.0",
+            "status": "online",
+            "llm_backend": cfg.llm_backend,
+            "model": cfg.active_model,
+            "embed_model": cfg.active_embed_model,
+            "document_chunks": get_document_count(),
+            "endpoints": [
+                "/health",
+                "/api/info",
+                "/documents/",
+                "/documents/ingest",
+                "/documents/{source_name}",
+                "/documents/clear",
+                "/documents/seed-samples",
+                "/query/",
+                "/query/ratio",
+                "/query/stream",
+                "/docs",
+            ],
+        }
+
     @app.get("/", tags=["system"])
     async def root():
-        return {
-            "name": "FinAgent RAG",
-            "docs": "/docs",
-            "health": "/health",
-        }
+        import os
+        from fastapi.responses import HTMLResponse
+        html_path = os.path.join(os.path.dirname(__file__), "index.html")
+        if os.path.exists(html_path):
+            with open(html_path, "r", encoding="utf-8") as f:
+                return HTMLResponse(content=f.read())
+        return HTMLResponse(content="<h1>FinAgent API is running</h1>")
 
     logger.info(f"FinAgent API ready | backend={cfg.llm_backend} model={cfg.active_model}")
     return app
+
 
 
 app = create_app()
