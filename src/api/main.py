@@ -40,6 +40,12 @@ def create_app() -> FastAPI:
     app.include_router(documents_router)
     app.include_router(query_router)
 
+    # Static Assets (Logo, Icons, etc.)
+    static_dir = Path(__file__).parent / "static"
+    if static_dir.exists():
+        from fastapi.staticfiles import StaticFiles
+        app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
     @app.get("/health", response_model=HealthResponse, tags=["system"])
     async def health() -> HealthResponse:
         return HealthResponse(

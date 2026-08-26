@@ -929,25 +929,4 @@ MIT License — free to use, modify, and distribute for personal and commercial 
 
 See [LICENSE](LICENSE) for the full text.
 
----
 
-## About
-
-Built as a portfolio demonstration of production-grade agentic RAG systems, showcasing:
-- Multi-agent orchestration with LangGraph
-- Hybrid retrieval-augmented generation
-- Dual LLM backend architecture
-- Production API design with FastAPI
-- Local-first AI (Ollama) with cloud fallback (OpenAI)
-
-**Contact / Hire:** [mfarhansh72@gmail.com](mailto:mfarhansh72@gmail.com)
-
----
-
-<div align="center">
-
-**If this project helped you, please give it a ⭐ on GitHub!**
-
-*Built with LangGraph • LlamaIndex • ChromaDB • FastAPI • Ollama*
-
-</div>
