@@ -42,6 +42,18 @@ def _get_embed_model() -> Any:
     from llama_index.core.embeddings import MockEmbedding
 
     cfg = get_settings()
+    if cfg.llm_backend == "gemini" and cfg.gemini_api_key and not cfg.gemini_api_key.startswith("placeholder"):
+        try:
+            from llama_index.embeddings.openai import OpenAIEmbedding
+            return OpenAIEmbedding(
+                model=cfg.gemini_embed_model,
+                api_key=cfg.gemini_api_key,
+                api_base="https://generativelanguage.googleapis.com/v1beta/openai/",
+            )
+        except Exception as exc:
+            logger.warning(f"Gemini embedding unavailable: {exc} — using MockEmbedding")
+            return MockEmbedding(embed_dim=384)
+
     if cfg.llm_backend == "openai" and cfg.openai_api_key and not cfg.openai_api_key.startswith("sk-placeholder"):
         try:
             from llama_index.embeddings.openai import OpenAIEmbedding

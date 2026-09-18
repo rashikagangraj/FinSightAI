@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
+from src.api.routes.cases import router as cases_router
 from src.api.routes.documents import router as documents_router
 from src.api.routes.query import router as query_router
 from src.api.schemas import HealthResponse
@@ -21,10 +22,10 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="FinSight AI API",
         description=(
-            "Financial Intelligence Agent — Turn financial documents into business decisions. "
-            "Supports OpenAI and local Ollama backends."
+            "Financial Intelligence & Decision Platform — Turn financial documents into business decisions. "
+            "Supports Gemini, OpenAI, and Ollama backends."
         ),
-        version="0.1.0",
+        version="0.2.0",
         docs_url="/docs",
         redoc_url="/redoc",
     )
@@ -39,6 +40,7 @@ def create_app() -> FastAPI:
 
     app.include_router(documents_router)
     app.include_router(query_router)
+    app.include_router(cases_router)
 
     # Static Assets (Logo, Icons, etc.)
     static_dir = Path(__file__).parent / "static"

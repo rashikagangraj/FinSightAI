@@ -3,8 +3,9 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 
+from src.api.auth import require_api_key
 from src.api.schemas import (
     DocumentActionResponse,
     DocumentIngestResponse,
@@ -14,7 +15,7 @@ from src.api.schemas import (
 from src.core.logging import get_logger
 from src.rag.indexer import get_document_count, ingest_file, list_indexed_sources
 
-router = APIRouter(prefix="/documents", tags=["documents"])
+router = APIRouter(prefix="/documents", tags=["documents"], dependencies=[Depends(require_api_key)])
 logger = get_logger(__name__)
 
 ALLOWED_EXTENSIONS = {".txt", ".md", ".pdf", ".csv", ".json"}

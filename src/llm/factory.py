@@ -37,6 +37,9 @@ class ResilientLLMClient(LLMClient):
 
 def get_llm_client() -> LLMClient:
     backend = get_settings().llm_backend
+    if backend == "gemini":
+        from src.llm.gemini_client import GeminiClient
+        return ResilientLLMClient(GeminiClient())
     if backend == "openai":
         from src.llm.openai_client import OpenAIClient
         return ResilientLLMClient(OpenAIClient())

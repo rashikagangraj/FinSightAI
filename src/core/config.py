@@ -19,7 +19,14 @@ class Settings(BaseSettings):
     )
 
     # Backend selection
-    llm_backend: Literal["openai", "ollama"] = "ollama"
+    llm_backend: Literal["openai", "ollama", "gemini"] = "gemini"
+
+    # Gemini
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-1.5-flash"
+    gemini_embed_model: str = "text-embedding-004"
+    gemini_temperature: float = 0.1
+    gemini_max_tokens: int = 2048
 
     # OpenAI
     openai_api_key: str = ""
@@ -50,6 +57,7 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     log_level: str = "INFO"
+    api_key: str = ""  # if set, Bearer token required on /query, /documents, /cases
 
     # Agent
     agent_max_iterations: int = 10
@@ -63,10 +71,14 @@ class Settings(BaseSettings):
 
     @property
     def active_model(self) -> str:
+        if self.llm_backend == "gemini":
+            return self.gemini_model
         return self.openai_model if self.llm_backend == "openai" else self.ollama_model
 
     @property
     def active_embed_model(self) -> str:
+        if self.llm_backend == "gemini":
+            return self.gemini_embed_model
         return self.openai_embed_model if self.llm_backend == "openai" else self.ollama_embed_model
 
 
@@ -79,6 +91,10 @@ def _merge_yaml_into_env(yaml_path: str = "config.yaml") -> None:
 
     mapping = {
         "llm_backend": data.get("llm_backend"),
+        "gemini_model": (data.get("gemini") or {}).get("model"),
+        "gemini_embed_model": (data.get("gemini") or {}).get("embed_model"),
+        "gemini_temperature": (data.get("gemini") or {}).get("temperature"),
+        "gemini_max_tokens": (data.get("gemini") or {}).get("max_tokens"),
         "openai_model": (data.get("openai") or {}).get("model"),
         "openai_embed_model": (data.get("openai") or {}).get("embed_model"),
         "openai_temperature": (data.get("openai") or {}).get("temperature"),

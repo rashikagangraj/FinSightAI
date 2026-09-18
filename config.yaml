@@ -1,4 +1,10 @@
-llm_backend: ollama          # "openai" or "ollama"
+llm_backend: gemini          # "gemini", "openai", or "ollama"
+
+gemini:
+  model: gemini-1.5-flash
+  embed_model: text-embedding-004
+  temperature: 0.1
+  max_tokens: 2048
 
 openai:
   model: gpt-4o-mini

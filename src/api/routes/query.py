@@ -3,11 +3,12 @@ from __future__ import annotations
 import asyncio
 import json
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
 from src.agents.graph import run_agent
 from src.agents.tools import calculate_financial_ratio
+from src.api.auth import require_api_key
 from src.api.schemas import (
     FinancialRatioRequest,
     FinancialRatioResponse,
@@ -18,7 +19,7 @@ from src.core.config import get_settings
 from src.core.logging import get_logger
 from src.rag.retriever import get_document_count
 
-router = APIRouter(prefix="/query", tags=["query"])
+router = APIRouter(prefix="/query", tags=["query"], dependencies=[Depends(require_api_key)])
 logger = get_logger(__name__)
 
 

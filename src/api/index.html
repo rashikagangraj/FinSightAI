@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinSight AI — Financial Intelligence Agent</title>
+    <title>aiKart — vibe trading with your professional financial agent team (FinSight AI)</title>
     <link rel="icon" type="image/jpeg" href="/static/logo.jpeg">
     
     <!-- Google Fonts -->
@@ -17,24 +17,83 @@
     <!-- Marked.js (Markdown renderer) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
+    <!-- Chart.js for Financial & Scenario Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
-            --bg-color: #080c14;
-            --panel-bg: rgba(15, 23, 42, 0.75);
-            --panel-card: rgba(30, 41, 59, 0.6);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --border-highlight: rgba(99, 102, 241, 0.4);
-            --accent-primary: #6366f1;
-            --accent-secondary: #10b981;
-            --accent-warning: #f59e0b;
-            --accent-danger: #ef4444;
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
-            --accent-glow: rgba(99, 102, 241, 0.25);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+            --bg-color: #f1f5f9;
+            --bg-gradient: radial-gradient(at 10% 12%, rgba(0, 80, 255, 0.10) 0px, transparent 45%),
+                           radial-gradient(at 90% 8%, rgba(127, 117, 149, 0.12) 0px, transparent 45%),
+                           radial-gradient(at 50% 50%, rgba(255, 174, 0, 0.05) 0px, transparent 55%),
+                           radial-gradient(at 85% 85%, rgba(0, 80, 255, 0.08) 0px, transparent 50%),
+                           radial-gradient(at 15% 85%, rgba(37, 99, 235, 0.07) 0px, transparent 50%),
+                           #f1f5f9;
+            --panel-bg: rgba(255, 255, 255, 0.75);
+            --panel-card: rgba(255, 255, 255, 0.82);
+            --panel-subtle: rgba(248, 250, 252, 0.65);
+            --border-color: rgba(226, 232, 240, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.9);
+            --border-light: rgba(241, 245, 249, 0.8);
+            --border-highlight: rgba(0, 80, 255, 0.45);
+            --accent-primary: #0050FF;
+            --accent-primary-hover: #0040cc;
+            --accent-secondary: #2563eb;
+            --accent-success: #059669;
+            --accent-warning: #d97706;
+            --accent-danger: #dc2626;
+            --accent-gradient: linear-gradient(135deg, #0050FF 0%, #2563eb 100%);
+            --accent-soft-blue: rgba(239, 246, 255, 0.7);
+            --accent-soft-blue-hover: rgba(219, 234, 254, 0.8);
+            --accent-glow: rgba(0, 80, 255, 0.25);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-light: #64748b;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            --shadow: 0 10px 30px -4px rgba(0, 80, 255, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+            --shadow-lg: 0 16px 40px -4px rgba(0, 80, 255, 0.12), 0 4px 14px -2px rgba(15, 23, 42, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 1);
             --font-main: 'Plus Jakarta Sans', -apple-system, sans-serif;
             --font-mono: 'Fira Code', monospace;
+        }
+
+        @keyframes hm-gradientShift {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .animated-gradient, .hm-grad {
+            display: inline-block;
+            background: linear-gradient(90deg, #0050FF 0%, #7F7595 25%, #FFAE00 50%, #7F7595 75%, #0050FF 100%);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            animation: hm-gradientShift 6s linear infinite;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .glass-pill {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(226, 232, 240, 0.9);
+            border-radius: 9999px;
         }
 
         * {
@@ -46,10 +105,7 @@
         body {
             font-family: var(--font-main);
             background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.18) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.14) 0px, transparent 50%),
-                radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.8) 0px, transparent 100%);
+            background-image: var(--bg-gradient);
             background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
@@ -64,29 +120,30 @@
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(226, 232, 240, 0.6);
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(148, 163, 184, 0.5);
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(100, 116, 139, 0.7);
         }
 
         /* Header */
         header {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0.85rem 2rem;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+            padding: 0.75rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
 
         .logo-container {
@@ -95,81 +152,66 @@
             gap: 0.9rem;
             cursor: pointer;
             text-decoration: none;
+            user-select: none;
+            padding: 2px 0;
+            transition: opacity 0.2s ease;
         }
 
-        .logo-img-wrapper {
-            height: 38px;
-            padding: 3px 10px;
-            background: #ffffff;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 15px rgba(99, 102, 241, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            flex-shrink: 0;
-        }
-
-        .logo-container:hover .logo-img-wrapper {
-            transform: translateY(-1px) scale(1.03);
-            box-shadow: 0 4px 18px rgba(99, 102, 241, 0.35);
+        .logo-container:hover {
+            opacity: 0.88;
         }
 
         .brand-logo-img {
-            height: 28px;
+            height: 34px;
             width: auto;
-            max-width: 130px;
+            max-width: 140px;
             object-fit: contain;
             display: block;
         }
 
         .brand-divider {
-            width: 1px;
-            height: 26px;
-            background: rgba(255, 255, 255, 0.16);
+            width: 1.5px;
+            height: 24px;
+            background: #e2e8f0;
+            border-radius: 1px;
         }
 
         .brand-titles {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .logo-icon {
-            background: var(--accent-gradient);
-            padding: 0.55rem;
-            border-radius: 12px;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px var(--accent-glow);
         }
 
         .logo-text {
-            font-size: 1.3rem;
+            font-size: 1.32rem;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.4px;
+            color: #0f172a;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-text .ai-accent {
+            color: var(--accent-primary);
+            margin-left: 1px;
         }
 
         .nav-tabs {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 0.3rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            gap: 0.3rem;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 0.28rem;
+            border-radius: 9999px;
+            border: 1.5px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
         }
 
         .nav-tab {
-            padding: 0.45rem 0.9rem;
-            font-size: 0.85rem;
+            padding: 0.45rem 1rem;
+            font-size: 0.82rem;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: 9999px;
             cursor: pointer;
             color: var(--text-muted);
             transition: all 0.2s ease;
@@ -181,125 +223,130 @@
         }
 
         .nav-tab:hover {
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent-primary);
+            background: #ffffff;
+            box-shadow: var(--shadow-sm);
         }
 
         .nav-tab.active {
             color: #ffffff;
             background: var(--accent-primary);
-            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 4px 14px rgba(0, 80, 255, 0.25);
+            border-radius: 9999px;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .status-badge {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-color);
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.82rem;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(226, 232, 240, 0.9);
+            padding: 0.4rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.45rem;
+            box-shadow: var(--shadow-sm);
         }
 
         .status-dot {
             width: 8px;
             height: 8px;
-            background-color: #ef4444;
+            background-color: var(--accent-danger);
             border-radius: 50%;
             display: inline-block;
         }
 
         .status-dot.active {
-            background-color: var(--accent-secondary);
-            box-shadow: 0 0 10px var(--accent-secondary);
+            background-color: var(--accent-success);
+            box-shadow: 0 0 10px rgba(5, 150, 105, 0.6);
         }
 
         .api-docs-btn {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 0.4rem 0.8rem;
-            border-radius: 10px;
-            font-size: 0.82rem;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(226, 232, 240, 0.9);
+            color: var(--accent-primary);
+            font-weight: 600;
+            padding: 0.4rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 0.4rem;
             transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
 
         .api-docs-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: var(--accent-primary);
+            color: #ffffff;
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(0, 80, 255, 0.25);
         }
 
         /* Container Layout */
         .main-container {
             display: grid;
-            grid-template-columns: 340px 1fr;
+            grid-template-columns: 320px 1fr;
             flex-grow: 1;
-            max-width: 1700px;
+            max-width: 1780px;
             width: 100%;
             margin: 0 auto;
-            gap: 1.5rem;
-            padding: 1.5rem;
-            height: calc(100vh - 75px);
+            gap: 1.25rem;
+            padding: 1.25rem;
+            height: calc(100vh - 72px);
         }
 
         /* Glass Panel */
         .glass-panel {
             background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 18px;
+            backdrop-filter: blur(24px) saturate(190%);
+            -webkit-backdrop-filter: blur(24px) saturate(190%);
             box-shadow: var(--shadow);
-            padding: 1.25rem;
-        }
-
-        /* Sidebar panels */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-            height: 100%;
-            overflow: hidden;
+            padding: 1.15rem;
         }
 
         .panel-title {
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 700;
-            margin-bottom: 0.85rem;
+            margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             color: var(--text-main);
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.45rem;
         }
 
         /* Upload Area */
         .upload-zone {
-            border: 2px dashed rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            padding: 1.25rem 1rem;
+            border: 2px dashed rgba(0, 80, 255, 0.35);
+            border-radius: 14px;
+            padding: 1.1rem 0.85rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8);
         }
 
-        .upload-zone:hover, .upload-zone.dragover {
+        .upload-zone:hover {
             border-color: var(--accent-primary);
-            background: rgba(99, 102, 241, 0.08);
+            background: rgba(239, 246, 255, 0.8);
+            box-shadow: 0 4px 16px rgba(0, 80, 255, 0.08);
             transform: translateY(-1px);
         }
 
@@ -314,28 +361,18 @@
         }
 
         .upload-icon {
-            color: var(--text-muted);
-            margin-bottom: 0.4rem;
-            transition: transform 0.3s ease;
-        }
-
-        .upload-zone:hover .upload-icon {
-            transform: translateY(-3px);
             color: var(--accent-primary);
+            margin-bottom: 0.3rem;
         }
 
         .upload-text {
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
         }
 
-        .upload-text strong {
-            color: var(--text-main);
-        }
-
         .upload-progress {
-            margin-top: 0.6rem;
-            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            font-size: 0.78rem;
             font-weight: 600;
             color: var(--accent-secondary);
             display: none;
@@ -344,37 +381,53 @@
         /* Quick Action Bar */
         .quick-actions {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.45rem;
             margin-top: 0.75rem;
         }
 
         .action-btn {
             flex: 1;
             padding: 0.45rem 0.6rem;
-            font-size: 0.75rem;
+            font-size: 0.76rem;
             font-weight: 600;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: rgba(255, 255, 255, 0.04);
+            border-radius: 9999px;
+            border: 1px solid var(--border-glass);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
             color: var(--text-main);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.35rem;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: var(--shadow-sm);
         }
 
         .action-btn:hover {
-            background: rgba(255, 255, 255, 0.09);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-1px);
+            background: #ffffff;
+            border-color: rgba(0, 80, 255, 0.35);
+            color: var(--accent-primary);
+            transform: translateY(-0.5px);
+            box-shadow: 0 4px 12px rgba(0, 80, 255, 0.1);
+        }
+
+        .action-btn.primary {
+            background: var(--accent-primary);
+            color: #ffffff;
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 14px rgba(0, 80, 255, 0.25);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--accent-primary-hover);
+            box-shadow: 0 6px 18px rgba(0, 80, 255, 0.35);
         }
 
         .action-btn.danger:hover {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: var(--accent-danger);
-            color: #fca5a5;
+            background: #fef2f2;
+            color: var(--accent-danger);
+            border-color: rgba(220, 38, 38, 0.4);
         }
 
         /* Document list */
@@ -393,20 +446,24 @@
         }
 
         .doc-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
             padding: 0.55rem 0.75rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.82rem;
+            gap: 0.45rem;
+            font-size: 0.8rem;
             transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
 
         .doc-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.95);
+            border-color: var(--accent-primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(0, 80, 255, 0.08);
         }
 
         .doc-name {
@@ -415,44 +472,431 @@
             text-overflow: ellipsis;
             flex-grow: 1;
             font-family: var(--font-mono);
-            font-size: 0.78rem;
+            font-size: 0.76rem;
+            color: var(--text-main);
         }
 
         .doc-badge {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
+            font-weight: 600;
             padding: 0.15rem 0.4rem;
             border-radius: 4px;
-            background: rgba(99, 102, 241, 0.2);
-            color: #a5b4fc;
+            background: #e0f2fe;
+            color: var(--accent-primary);
         }
 
         .doc-del-btn {
             background: transparent;
             border: none;
-            color: var(--text-muted);
+            color: var(--text-light);
             cursor: pointer;
             padding: 2px;
             display: flex;
             align-items: center;
-            opacity: 0.6;
+            opacity: 0.7;
             transition: all 0.2s ease;
         }
 
         .doc-del-btn:hover {
             color: var(--accent-danger);
             opacity: 1;
-            transform: scale(1.1);
         }
 
-        .no-docs {
-            font-size: 0.82rem;
+        /* View Switching */
+        .view-content {
+            display: none;
+            height: 100%;
+        }
+        .view-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── CASE STUDY SIMULATOR STYLES ─────────────────────────────────────── */
+        .case-hub-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 340px;
+            gap: 1rem;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .case-list-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            overflow-y: auto;
+            padding-right: 0.35rem;
+        }
+
+        .case-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .case-card:hover {
+            border-color: rgba(0, 80, 255, 0.5);
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 80, 255, 0.08), inset 0 1px 0 #ffffff;
+        }
+
+        .case-card.active {
+            border-color: var(--accent-primary);
+            background: rgba(239, 246, 255, 0.9);
+            box-shadow: 0 0 0 2px rgba(0, 80, 255, 0.3), 0 8px 24px rgba(0, 80, 255, 0.1);
+        }
+
+        .case-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .diff-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .diff-beginner { background: #ecfdf5; color: #047857; }
+        .diff-intermediate { background: #eff6ff; color: #0050FF; }
+        .diff-advanced { background: #fffbeb; color: #b45309; }
+        .diff-expert { background: #fef2f2; color: #b91c1c; }
+
+        .case-topic-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .case-title-txt {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .case-company-txt {
+            font-size: 0.74rem;
             color: var(--text-muted);
+        }
+
+        /* Workspace Main Tab Area */
+        .workspace-center {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            overflow-y: auto;
+            padding-right: 0.4rem;
+        }
+
+        .dossier-box {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 1.1rem;
+            font-size: 0.86rem;
+            line-height: 1.55;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .dossier-box h2, .dossier-box h3 {
+            color: var(--accent-primary);
+            font-size: 1rem;
+            margin: 0.6rem 0 0.3rem 0;
+        }
+
+        .dossier-box ul {
+            margin-left: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Financial Table */
+        .fin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .fin-table th, .fin-table td {
+            padding: 0.5rem 0.65rem;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .fin-table th:first-child, .fin-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .fin-table th {
+            background: rgba(239, 246, 255, 0.85);
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        /* Simulation Controls Card */
+        .simulator-box {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .slider-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.85rem;
+        }
+
+        .slider-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .slider-header span.val {
+            color: var(--accent-primary);
+            font-family: var(--font-mono);
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.85rem;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-header-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 180px;
+            width: 100%;
+        }
+
+        /* Decision Right Sidebar */
+        .decision-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            overflow-y: auto;
+            padding-right: 0.25rem;
+        }
+
+        .decision-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.35rem;
+        }
+
+        .decision-btn {
+            padding: 0.45rem 0.25rem;
+            font-size: 0.74rem;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
             text-align: center;
-            padding: 1.5rem 0;
+        }
+
+        .decision-btn:hover {
+            border-color: var(--accent-primary);
+            background: var(--accent-soft-blue);
+        }
+
+        .decision-btn.active-buy {
+            background: #ecfdf5;
+            border-color: #10b981;
+            color: #047857;
+        }
+
+        .decision-btn.active-hold {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            color: #b45309;
+        }
+
+        .decision-btn.active-sell {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .form-label {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.2rem;
+            display: block;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 0.65rem;
+            font-family: var(--font-main);
+            font-size: 0.82rem;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 80, 255, 0.1);
+        }
+
+        .score-hero {
+            background: var(--accent-gradient);
+            border-radius: 14px;
+            padding: 1.25rem;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 16px rgba(0, 80, 255, 0.25);
+        }
+
+        .score-number {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1;
+            font-family: var(--font-mono);
+        }
+
+        .score-badge-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .score-breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.65rem;
+        }
+
+        .breakdown-card {
+            background: #f8faff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 0.6rem;
+            text-align: center;
+        }
+
+        .breakdown-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .breakdown-val {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+            font-family: var(--font-mono);
+            margin-top: 0.2rem;
+        }
+
+        /* Feedback Lists */
+        .eval-section {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .eval-section h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .eval-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            font-size: 0.82rem;
+        }
+
+        .eval-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4rem;
             line-height: 1.4;
         }
 
-        /* Chat Panel */
+        /* ── CHAT STYLES ── */
         .chat-panel {
             display: flex;
             flex-direction: column;
@@ -466,42 +910,18 @@
             align-items: center;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 0.75rem;
-            margin-bottom: 0.85rem;
+            margin-bottom: 0.75rem;
         }
 
         .chat-title {
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-main);
         }
 
         .chat-subtitle {
             font-size: 0.78rem;
             color: var(--text-muted);
-        }
-
-        .chat-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .mode-toggle {
-            font-size: 0.75rem;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            padding: 0.3rem 0.6rem;
-            border-radius: 8px;
-            color: var(--text-muted);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-
-        .mode-toggle.active {
-            background: rgba(16, 185, 129, 0.15);
-            border-color: rgba(16, 185, 129, 0.4);
-            color: #6ee7b7;
         }
 
         .chat-messages {
@@ -510,14 +930,14 @@
             padding-right: 0.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 1.1rem;
             margin-bottom: 0.75rem;
         }
 
         .message {
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
+            gap: 0.35rem;
             max-width: 88%;
             animation: fadeIn 0.3s ease forwards;
         }
@@ -527,36 +947,31 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .message.user {
-            align-self: flex-end;
-        }
-
-        .message.bot {
-            align-self: flex-start;
-            width: 100%;
-            max-width: 95%;
-        }
+        .message.user { align-self: flex-end; }
+        .message.bot { align-self: flex-start; width: 100%; max-width: 95%; }
 
         .message-bubble {
             padding: 0.95rem 1.25rem;
             border-radius: 16px;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             line-height: 1.55;
-            position: relative;
         }
 
         .message.user .message-bubble {
             background: var(--accent-gradient);
             color: #ffffff;
             border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+            box-shadow: 0 4px 16px rgba(0, 80, 255, 0.25);
         }
 
         .message.bot .message-bubble {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--border-glass);
             border-bottom-left-radius: 4px;
             color: var(--text-main);
+            box-shadow: var(--shadow-sm);
         }
 
         .message-metadata {
@@ -569,163 +984,59 @@
         }
 
         .intent-badge {
-            background: rgba(16, 185, 129, 0.15);
-            color: #6ee7b7;
+            background: #e0f2fe;
+            color: var(--accent-primary);
             padding: 0.15rem 0.45rem;
             border-radius: 4px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             font-size: 0.68rem;
         }
 
-        .copy-msg-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 0.72rem;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            transition: color 0.2s;
-        }
-
-        .copy-msg-btn:hover {
-            color: var(--text-main);
-        }
-
-        /* Agent Trace Accordion */
-        .trace-container {
-            margin-top: 0.6rem;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .trace-header {
-            padding: 0.5rem 0.8rem;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.02);
-            user-select: none;
-        }
-
-        .trace-header:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-        }
-
-        .trace-body {
-            display: none;
-            padding: 0.75rem;
-            border-top: 1px solid var(--border-color);
-            flex-direction: column;
-            gap: 0.4rem;
-            max-height: 220px;
-            overflow-y: auto;
-        }
-
-        .trace-step {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: #a5b4fc;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.4rem;
-        }
-
-        /* Sources */
-        .sources-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-            margin-top: 0.65rem;
-            padding-top: 0.55rem;
-            border-top: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-
-        .source-chip {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 6px;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.72rem;
-            font-family: var(--font-mono);
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        /* Suggestions */
         .suggestions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 0.65rem;
-            padding-bottom: 0.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.55rem;
+            padding-bottom: 0.4rem;
         }
 
         .suggestion-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0.7rem 0.85rem;
-            font-size: 0.82rem;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            border-radius: 14px;
+            padding: 0.75rem 0.95rem;
+            font-size: 0.8rem;
             cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
         }
 
         .suggestion-card:hover {
-            background: rgba(99, 102, 241, 0.08);
-            border-color: var(--border-highlight);
+            background: #ffffff;
+            border-color: rgba(0, 80, 255, 0.45);
             transform: translateY(-2px);
-        }
-
-        .suggestion-title {
-            font-weight: 700;
-            color: var(--accent-primary);
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .suggestion-text {
-            color: var(--text-muted);
-            line-height: 1.35;
-        }
-
-        .suggestion-card:hover .suggestion-text {
-            color: var(--text-main);
-        }
-
-        /* Chat Input */
-        .chat-input-container {
-            position: relative;
+            box-shadow: 0 8px 24px rgba(0, 80, 255, 0.08);
         }
 
         .chat-input-wrapper {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 0.4rem;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1.5px solid rgba(226, 232, 240, 0.9);
+            border-radius: 28px;
+            padding: 0.35rem 0.55rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 80, 255, 0.05);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .chat-input-wrapper:focus-within {
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 20px var(--accent-glow);
+            border-color: rgba(0, 80, 255, 0.6);
+            box-shadow: 0 0 0 4px rgba(0, 80, 255, 0.12), 0 12px 32px rgba(0, 80, 255, 0.08);
         }
 
         .chat-input {
@@ -734,225 +1045,81 @@
             outline: none;
             color: var(--text-main);
             font-family: var(--font-main);
-            font-size: 0.92rem;
-            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
+            padding: 0.5rem 0.85rem;
             flex-grow: 1;
-            height: 42px;
+            height: 40px;
         }
 
         .send-btn {
             background: var(--accent-gradient);
             border: none;
-            outline: none;
             color: #ffffff;
-            width: 38px;
             height: 38px;
-            border-radius: 10px;
+            padding: 0 1.25rem;
+            border-radius: 9999px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .send-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
-
-        .send-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Loader */
-        .agent-loader {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--accent-secondary);
+            gap: 0.4rem;
+            font-weight: 600;
             font-size: 0.82rem;
-            font-weight: 500;
-            padding: 0.5rem 0.9rem;
-            border-radius: 8px;
-            background: rgba(16, 185, 129, 0.06);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            align-self: flex-start;
-            animation: pulse 1.5s infinite ease-in-out;
-            margin-bottom: 0.75rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 80, 255, 0.25);
+            transition: all 0.2s ease;
+            flex-shrink: 0;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.03);
+            box-shadow: 0 6px 18px rgba(0, 80, 255, 0.35);
         }
 
-        /* Markdown Overrides */
-        .markdown-content p {
-            margin-bottom: 0.65rem;
-        }
-        .markdown-content p:last-child {
-            margin-bottom: 0;
-        }
-        .markdown-content table {
+        /* Leaderboard Table */
+        .lb-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 0.75rem 0;
-            font-size: 0.82rem;
-        }
-        .markdown-content th, .markdown-content td {
+            font-size: 0.84rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            overflow: hidden;
             border: 1px solid var(--border-color);
-            padding: 0.5rem 0.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .lb-table th, .lb-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
             text-align: left;
         }
-        .markdown-content th {
-            background: rgba(255, 255, 255, 0.05);
-            font-weight: 600;
-            color: #a5b4fc;
-        }
-        .markdown-content h2, .markdown-content h3 {
-            font-size: 1.05rem;
+
+        .lb-table th {
+            background: #eff6ff;
+            color: var(--accent-primary);
             font-weight: 700;
-            margin: 0.85rem 0 0.4rem 0;
-            color: #a5b4fc;
-        }
-        .markdown-content ul, .markdown-content ol {
-            margin: 0.4rem 0 0.65rem 1.25rem;
-        }
-        .markdown-content li {
-            margin-bottom: 0.25rem;
-        }
-        .markdown-content code {
-            font-family: var(--font-mono);
-            font-size: 0.82rem;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 0.15rem 0.35rem;
-            border-radius: 4px;
-            color: #38bdf8;
         }
 
-        /* View Switching */
-        .view-content {
-            display: none;
-            height: 100%;
-        }
-        .view-content.active {
-            display: flex;
-            flex-direction: column;
+        .lb-table tr:hover td {
+            background: rgba(248, 250, 252, 0.8);
         }
 
-        /* Ratio Calculator Tool View */
-        .calculator-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.25rem;
-            height: 100%;
-            overflow-y: auto;
-            padding-right: 0.5rem;
-        }
-
-        .calc-card {
-            background: var(--panel-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.85rem;
-        }
-
-        .calc-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .calc-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .calc-badge {
-            font-size: 0.72rem;
-            padding: 0.15rem 0.5rem;
-            border-radius: 4px;
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-        }
-
-        .calc-inputs {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .input-group {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-        }
-
-        .input-group label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .calc-input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 0.5rem 0.75rem;
-            color: var(--text-main);
-            font-family: var(--font-mono);
-            font-size: 0.88rem;
-            outline: none;
-        }
-
-        .calc-input:focus {
-            border-color: var(--accent-primary);
-        }
-
-        .calc-result-box {
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 0.75rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .calc-val {
-            font-family: var(--font-mono);
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--accent-secondary);
-        }
-
-        .calc-desc {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-
-        /* Toast notifications */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: rgba(15, 23, 42, 0.95);
+            background: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 0.8rem 1.2rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: var(--shadow-lg);
             display: flex;
             align-items: center;
-            gap: 0.6rem;
-            font-size: 0.85rem;
-            z-index: 1000;
+            gap: 0.55rem;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--text-main);
+            z-index: 2000;
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -966,24 +1133,22 @@
 </head>
 <body>
 
-    <!-- Top Header -->
+    <!-- Header -->
     <header>
-        <div class="logo-container" onclick="switchView('chat')">
-            <div class="logo-img-wrapper" title="AIKART">
-                <img src="/static/logo.jpeg" alt="AIKART Logo" class="brand-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="logo-icon" style="display: none; width: 28px; height: 28px; border-radius: 6px;">
-                    <i data-lucide="trending-up" style="color: white; width: 16px; height: 16px;"></i>
-                </div>
-            </div>
+        <div class="logo-container" onclick="switchView('cases')" title="FinSight AI Dashboard">
+            <img src="/static/logo.jpeg" alt="Ai kart Logo" class="brand-logo-img" onerror="this.style.display='none'">
             <div class="brand-divider"></div>
             <div class="brand-titles">
-                <span class="logo-text">FinSight AI</span>
-                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: -2px;">Financial Intelligence Agent</span>
+                <span class="logo-text">FinSight<span class="ai-accent">AI</span></span>
             </div>
         </div>
 
         <nav class="nav-tabs">
-            <button class="nav-tab active" id="tab-chat" onclick="switchView('chat')">
+            <button class="nav-tab active" id="tab-cases" onclick="switchView('cases')">
+                <i data-lucide="crosshair" style="width: 15px; height: 15px;"></i>
+                Decision Simulator
+            </button>
+            <button class="nav-tab" id="tab-chat" onclick="switchView('chat')">
                 <i data-lucide="message-square" style="width: 15px; height: 15px;"></i>
                 Intelligence Chat
             </button>
@@ -991,115 +1156,236 @@
                 <i data-lucide="calculator" style="width: 15px; height: 15px;"></i>
                 Financial Ratios
             </button>
+            <button class="nav-tab" id="tab-leaderboard" onclick="switchView('leaderboard')">
+                <i data-lucide="award" style="width: 15px; height: 15px;"></i>
+                Leaderboard & Progress
+            </button>
             <button class="nav-tab" id="tab-graph" onclick="switchView('graph')">
                 <i data-lucide="git-fork" style="width: 15px; height: 15px;"></i>
-                Agent Workflow
+                Agent Architecture
             </button>
         </nav>
 
         <div class="header-actions">
-            <div class="status-badge" title="LLM Backend Status">
-                <span class="status-dot" id="backend-status"></span>
-                <span id="backend-text">Connecting...</span>
+            <div class="status-badge" title="LLM Engine Status">
+                <span class="status-dot active" id="status-dot"></span>
+                <span id="status-text">AI Agent Ready</span>
             </div>
-            <div class="status-badge" title="Indexed Chunks in ChromaDB">
-                <i data-lucide="database" style="width: 13px; height: 13px; color: var(--accent-secondary);"></i>
-                <span id="doc-count-text">0 chunks</span>
-            </div>
-            <a href="/docs" target="_blank" class="api-docs-btn" title="Open Swagger API documentation">
+            <a href="/docs" target="_blank" class="api-docs-btn" title="Open API Documentation">
                 <i data-lucide="book-open" style="width: 14px; height: 14px;"></i>
-                API Docs
+                Docs
             </a>
         </div>
     </header>
 
-    <!-- Main Container -->
+    <!-- Main Workspace Container -->
     <div class="main-container">
-        <!-- Sidebar: Ingestion & Document Hub -->
-        <div class="sidebar">
-            <!-- Upload Panel -->
-            <div class="glass-panel">
+        <!-- Sidebar: Document Ingestion & Quick Info -->
+        <div class="sidebar" style="display: flex; flex-direction: column; gap: 1rem; height: 100%; overflow: hidden;">
+            <!-- Document Hub Panel -->
+            <div class="glass-panel" style="padding: 1rem;">
                 <div class="panel-title">
                     <span style="display: flex; align-items: center; gap: 0.4rem;">
-                        <i data-lucide="upload-cloud" style="width: 16px; height: 16px; color: var(--accent-primary);"></i>
-                        Document Ingestion
+                        <i data-lucide="upload-cloud" style="width: 15px; height: 15px; color: var(--accent-primary);"></i>
+                        Document Hub
                     </span>
-                    <span style="font-size: 0.72rem; color: var(--text-muted);">PDF, TXT, MD, CSV, JSON</span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted);">PDF / 10-K / CSV</span>
                 </div>
                 <div class="upload-zone" id="upload-zone">
-                    <i data-lucide="file-plus" class="upload-icon" style="width: 28px; height: 28px;"></i>
+                    <i data-lucide="file-plus" class="upload-icon" style="width: 24px; height: 24px;"></i>
                     <div class="upload-text">
-                        <strong>Click to upload</strong> or drag & drop<br>
-                        <span style="font-size: 0.72rem; opacity: 0.7;">10-K, transcripts, reports</span>
+                        <strong>Click or drag filings</strong>
                     </div>
                     <input type="file" id="file-input" accept=".pdf,.txt,.md,.csv,.json">
                 </div>
-                <div class="upload-progress" id="upload-progress">Uploading and indexing...</div>
+                <div class="upload-progress" id="upload-progress">Uploading...</div>
                 
                 <div class="quick-actions">
-                    <button class="action-btn" onclick="seedSamples()" title="Load bundled Apple, Tesla, S&P 500 reports">
-                        <i data-lucide="sparkles" style="width: 12px; height: 12px; color: var(--accent-secondary);"></i>
-                        Seed Sample Docs
+                    <button class="action-btn" onclick="seedSamples()" title="Load sample financial reports">
+                        <i data-lucide="sparkles" style="width: 12px; height: 12px; color: var(--accent-primary);"></i>
+                        Seed Docs
                     </button>
-                    <button class="action-btn danger" onclick="clearDocuments()" title="Delete all indexed data">
+                    <button class="action-btn danger" onclick="clearDocuments()" title="Clear vector index">
                         <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
-                        Clear All
+                        Clear
                     </button>
                 </div>
             </div>
 
-            <!-- Documents Panel -->
-            <div class="glass-panel" style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;">
+            <!-- Indexed Documents List -->
+            <div class="glass-panel" style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; padding: 1rem;">
                 <div class="panel-title">
                     <span style="display: flex; align-items: center; gap: 0.4rem;">
-                        <i data-lucide="files" style="width: 16px; height: 16px; color: var(--accent-secondary);"></i>
-                        Indexed Documents
+                        <i data-lucide="files" style="width: 15px; height: 15px; color: var(--accent-secondary);"></i>
+                        Indexed Files
                     </span>
-                    <button id="refresh-docs-btn" onclick="fetchDocuments()" style="background: transparent; border: none; cursor: pointer; color: var(--text-muted);" title="Refresh list">
+                    <button onclick="fetchDocuments()" style="background: transparent; border: none; cursor: pointer; color: var(--text-muted);" title="Refresh">
                         <i data-lucide="rotate-cw" style="width: 13px; height: 13px;"></i>
                     </button>
                 </div>
                 <div class="doc-list-container">
-                    <ul class="doc-list" id="doc-list">
-                        <!-- Populated by JS -->
-                    </ul>
+                    <ul class="doc-list" id="doc-list"></ul>
                 </div>
             </div>
         </div>
 
-        <!-- Main View Area -->
+        <!-- Main Content Area -->
         <div class="glass-panel" style="overflow: hidden; height: 100%;">
             
-            <!-- View 1: Chat View -->
-            <div class="view-content active" id="view-chat">
+            <!-- ════════ VIEW 1: CASE STUDY & DECISION SIMULATOR ════════ -->
+            <div class="view-content active" id="view-cases">
+                <div class="case-hub-grid">
+                    
+                    <!-- Left: Case Study Selector -->
+                    <div class="case-list-sidebar">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-main);">Case Library</span>
+                            <button class="action-btn primary" onclick="openGenModal()" style="flex: initial; padding: 0.22rem 0.48rem; font-size: 0.68rem; border-radius: 6px; gap: 0.3rem; height: 26px;">
+                                <i data-lucide="sparkles" style="width: 11px; height: 11px;"></i>
+                                Generate AI Case
+                            </button>
+                        </div>
+                        <div id="cases-cards-container" style="display: flex; flex-direction: column; gap: 0.6rem;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Center: Case Dossier & Simulator Workspace -->
+                    <div class="workspace-center">
+                        <div class="dossier-box" id="dossier-box">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h2 id="dossier-title" style="margin: 0; font-size: 1.05rem;">Case Dossier</h2>
+                                <span id="dossier-badge" class="diff-badge diff-intermediate">INTERMEDIATE</span>
+                            </div>
+                            <div id="dossier-content" style="margin-top: 0.65rem; color: var(--text-muted);">
+                                Loading scenario intelligence and financial context...
+                            </div>
+                            <div id="dossier-financials" style="margin-top: 0.75rem;"></div>
+                        </div>
+
+                        <!-- Scenario Sliders & Visualization Charts -->
+                        <div class="simulator-box">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 0.88rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.35rem;">
+                                    <i data-lucide="sliders" style="width: 15px; height: 15px; color: var(--accent-primary);"></i>
+                                    Interactive Financial Scenario Simulator
+                                </span>
+                                <span style="font-size: 0.74rem; color: var(--text-muted);">Adjust variables to model impact</span>
+                            </div>
+
+                            <div class="slider-grid" id="sliders-container">
+                                <!-- Dynamic Scenario Sliders generated by JS -->
+                            </div>
+
+                            <div class="charts-grid">
+                                <div class="chart-card">
+                                    <span class="chart-header-title">
+                                        <i data-lucide="bar-chart-3" style="width: 13px; height: 13px;"></i>
+                                        Projected Valuation Distribution ($B)
+                                    </span>
+                                    <div class="chart-wrapper">
+                                        <canvas id="valuationChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="chart-card">
+                                    <span class="chart-header-title">
+                                        <i data-lucide="line-chart" style="width: 13px; height: 13px;"></i>
+                                        Operating Margin Sensitivity Trajectory (%)
+                                    </span>
+                                    <div class="chart-wrapper">
+                                        <canvas id="marginChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Decision Submission & AI Feedback Evaluation -->
+                    <div class="decision-sidebar">
+                        <div class="glass-panel" style="padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                            <span style="font-size: 0.88rem; font-weight: 700; color: var(--text-main);">Submit Your Strategic Decision</span>
+                            
+                            <div>
+                                <label class="form-label">Recommendation Stance</label>
+                                <div class="decision-picker-grid">
+                                    <button class="decision-btn" id="dec-buy" onclick="selectDecision('BUY')">BUY</button>
+                                    <button class="decision-btn" id="dec-hold" onclick="selectDecision('HOLD')">HOLD</button>
+                                    <button class="decision-btn" id="dec-sell" onclick="selectDecision('SELL')">SELL</button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label">Fair Value Target ($ / ₹)</label>
+                                <input type="number" class="form-input" id="dec-target" placeholder="e.g. 195.50">
+                            </div>
+
+                            <div>
+                                <label class="form-label">Strategic Rationale & Thesis</label>
+                                <textarea class="form-textarea" id="dec-rationale" rows="3" placeholder="Explain the key catalysts, risks, and financial ratios that justify your recommendation..."></textarea>
+                            </div>
+
+                            <button class="action-btn primary" onclick="submitDecision()" style="padding: 0.6rem; justify-content: center; width: 100%;">
+                                <i data-lucide="check-circle" style="width: 15px; height: 15px;"></i>
+                                Submit & Evaluate Decision
+                            </button>
+                        </div>
+
+                        <!-- AI Evaluation Results Section -->
+                        <div id="eval-result-card" style="display: none; flex-direction: column; gap: 0.75rem;">
+                            <div class="score-hero">
+                                <div class="score-badge-box">
+                                    <span style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; opacity: 0.9;">EVALUATION SCORE</span>
+                                    <span class="score-number" id="eval-score">0</span>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span id="eval-badge" style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.6rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem;">MASTER</span>
+                                </div>
+                            </div>
+
+                            <div class="eval-section">
+                                <h4 style="color: var(--accent-success);"><i data-lucide="thumbs-up" style="width: 14px; height: 14px;"></i> Strengths</h4>
+                                <ul class="eval-list" id="eval-strengths"></ul>
+                            </div>
+
+                            <div class="eval-section">
+                                <h4 style="color: var(--accent-warning);"><i data-lucide="alert-triangle" style="width: 14px; height: 14px;"></i> Blindspots</h4>
+                                <ul class="eval-list" id="eval-blindspots"></ul>
+                            </div>
+
+                            <div class="eval-section">
+                                <h4 style="color: var(--accent-primary);"><i data-lucide="award" style="width: 14px; height: 14px;"></i> Optimal Strategy</h4>
+                                <div id="eval-optimal" style="font-size: 0.82rem; line-height: 1.45;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ════════ VIEW 2: INTELLIGENCE CHAT (MULTI-DOC RAG) ════════ -->
+            <div class="view-content" id="view-chat">
                 <div class="chat-panel">
                     <div class="chat-header">
                         <div>
-                            <h2 class="chat-title">Interactive Financial Intelligence</h2>
+                            <h2 class="chat-title"><span class="hm-grad">aiKart</span> Interactive Intelligence & Financial Agent</h2>
                             <p class="chat-subtitle" id="model-subtitle">Backend: ... | Model: ...</p>
                         </div>
-                        <div class="chat-controls">
-                            <button class="mode-toggle" id="stream-toggle" onclick="toggleStreamingMode()" title="Toggle SSE Token Streaming vs Agent Graph Reasoning">
-                                <i data-lucide="zap" style="width: 13px; height: 13px;"></i>
-                                <span id="stream-mode-label">Mode: Agent Graph</span>
-                            </button>
-                            <button class="action-btn" onclick="exportChatMarkdown()" title="Export chat history as Markdown">
+                        <div class="header-actions">
+                            <button class="action-btn" onclick="exportChatMarkdown()">
                                 <i data-lucide="download" style="width: 13px; height: 13px;"></i>
-                                Export
+                                Export Chat
                             </button>
                         </div>
                     </div>
 
-                    <!-- Chat messages -->
                     <div class="chat-messages" id="chat-messages">
                         <div class="message bot">
                             <div class="message-bubble">
-                                Welcome to <strong>FinSight AI</strong>. <em>Turn financial documents into business decisions.</em>
-                                <br><br>
-                                You can upload financial reports, 10-Ks, or earnings transcripts on the sidebar, or click <strong>"Seed Sample Docs"</strong> to start testing immediately with AIKART, Apple, Tesla, and S&P 500 reports!
+                                Welcome to <strong>FinSight AI</strong>. Ask any cross-document financial question, ratio calculation, or company comparison across your uploaded reports.
                             </div>
                             <div class="message-metadata">
-                                <span>FinSight AI System</span>
+                                <span>FinSight AI Agent</span>
                                 <span class="intent-badge">READY</span>
                             </div>
                         </div>
@@ -1107,241 +1393,125 @@
 
                     <div id="loader-container"></div>
 
-                    <!-- Suggestions -->
                     <div class="suggestions" id="suggestions-container">
                         <div class="suggestion-card" onclick="useSuggestion('Compare Apple and Tesla gross margins in 2023 and explain the variance')">
-                            <span class="suggestion-title">Comparison</span>
-                            <span class="suggestion-text">"Compare Apple and Tesla gross margins in 2023"</span>
+                            <strong>Comparison</strong>: "Compare Apple and Tesla gross margins"
                         </div>
                         <div class="suggestion-card" onclick="useSuggestion('Calculate Apple\'s Return on Assets (ROA) and free cash flow margin')">
-                            <span class="suggestion-title">Deep Financial Analysis</span>
-                            <span class="suggestion-text">"Calculate Apple's ROA and cash flow margin"</span>
-                        </div>
-                        <div class="suggestion-card" onclick="useSuggestion('What was Apple\'s total revenue in fiscal year 2023?')">
-                            <span class="suggestion-title">Fact Extraction</span>
-                            <span class="suggestion-text">"What was Apple's total revenue in FY2023?"</span>
+                            <strong>Deep Analysis</strong>: "Calculate Apple's ROA & cash flow margin"
                         </div>
                         <div class="suggestion-card" onclick="useSuggestion('Generate a structured financial summary of the S&P 500 performance in 2023')">
-                            <span class="suggestion-title">Report Generator</span>
-                            <span class="suggestion-text">"Generate financial summary of S&P 500 performance"</span>
+                            <strong>Report</strong>: "Generate financial summary of S&P 500"
                         </div>
                     </div>
 
-                    <!-- Chat Input -->
-                    <div class="chat-input-container">
-                        <div class="chat-input-wrapper">
-                            <input type="text" class="chat-input" id="chat-input" placeholder="Ask a financial question, ratio calculation, or company comparison..." autocomplete="off">
-                            <button class="send-btn" id="send-btn" onclick="submitQuery()" disabled title="Submit query">
-                                <i data-lucide="send" style="width: 16px; height: 16px;"></i>
-                            </button>
-                        </div>
+                    <div class="chat-input-wrapper">
+                        <input type="text" class="chat-input" id="chat-input" placeholder="Ask a financial question, ratio inquiry, or multi-filing comparison...">
+                        <button class="send-btn" id="send-btn" onclick="submitQuery()" disabled>
+                            <i data-lucide="send" style="width: 15px; height: 15px;"></i>
+                            Send
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- View 2: Financial Ratio Calculator -->
+            <!-- ════════ VIEW 3: FINANCIAL RATIO SANDBOX ════════ -->
             <div class="view-content" id="view-calc">
                 <div class="chat-header">
                     <div>
                         <h2 class="chat-title">Financial Ratio & Valuation Sandbox</h2>
-                        <p class="chat-subtitle">Instant mathematical computation & financial benchmarking</p>
+                        <p class="chat-subtitle">Instant formula computation and financial benchmarking</p>
                     </div>
                 </div>
-
-                <div class="calculator-grid">
-                    <!-- Card 1: P/E Ratio -->
-                    <div class="calc-card">
-                        <div class="calc-header">
-                            <span class="calc-title">Price-to-Earnings (P/E) Ratio</span>
-                            <span class="calc-badge">Valuation</span>
+                <div class="slider-grid" style="overflow-y: auto; padding-right: 0.5rem;">
+                    <!-- Card 1 -->
+                    <div class="dossier-box">
+                        <span style="font-weight: 700; color: var(--accent-primary);">Price-to-Earnings (P/E) Ratio</span>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input type="number" class="form-input" id="pe-price" value="180" oninput="calcPE()" placeholder="Stock Price ($)">
+                            <input type="number" class="form-input" id="pe-eps" value="6.13" oninput="calcPE()" placeholder="EPS ($)">
                         </div>
-                        <div class="calc-desc">Measures company share price relative to its per-share earnings.</div>
-                        <div class="calc-inputs">
-                            <div class="input-group">
-                                <label>Stock Price ($)</label>
-                                <input type="number" class="calc-input" id="pe-price" value="180" oninput="calcPE()">
-                            </div>
-                            <div class="input-group">
-                                <label>Earnings Per Share ($)</label>
-                                <input type="number" class="calc-input" id="pe-eps" value="6.13" oninput="calcPE()">
-                            </div>
-                        </div>
-                        <div class="calc-result-box">
-                            <span style="font-size: 0.85rem; color: var(--text-muted);">P/E Ratio:</span>
-                            <span class="calc-val" id="pe-result">29.36x</span>
-                        </div>
+                        <div style="margin-top: 0.5rem; font-weight: 800; color: var(--accent-primary); font-size: 1.1rem;" id="pe-result">29.36x</div>
                     </div>
-
-                    <!-- Card 2: Return on Assets (ROA) -->
-                    <div class="calc-card">
-                        <div class="calc-header">
-                            <span class="calc-title">Return on Assets (ROA)</span>
-                            <span class="calc-badge">Profitability</span>
+                    <!-- Card 2 -->
+                    <div class="dossier-box">
+                        <span style="font-weight: 700; color: var(--accent-primary);">Return on Assets (ROA)</span>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input type="number" class="form-input" id="roa-income" value="96.99" oninput="calcROA()" placeholder="Net Income ($B)">
+                            <input type="number" class="form-input" id="roa-assets" value="352.58" oninput="calcROA()" placeholder="Total Assets ($B)">
                         </div>
-                        <div class="calc-desc">Evaluates how efficiently a company uses its assets to generate net income.</div>
-                        <div class="calc-inputs">
-                            <div class="input-group">
-                                <label>Net Income ($B)</label>
-                                <input type="number" class="calc-input" id="roa-income" value="96.99" oninput="calcROA()">
-                            </div>
-                            <div class="input-group">
-                                <label>Total Assets ($B)</label>
-                                <input type="number" class="calc-input" id="roa-assets" value="352.58" oninput="calcROA()">
-                            </div>
-                        </div>
-                        <div class="calc-result-box">
-                            <span style="font-size: 0.85rem; color: var(--text-muted);">ROA Percentage:</span>
-                            <span class="calc-val" id="roa-result">27.51%</span>
-                        </div>
+                        <div style="margin-top: 0.5rem; font-weight: 800; color: var(--accent-primary); font-size: 1.1rem;" id="roa-result">27.51%</div>
                     </div>
-
-                    <!-- Card 3: 3-Stage DuPont ROE Decomposition -->
-                    <div class="calc-card">
-                        <div class="calc-header">
-                            <span class="calc-title">3-Stage DuPont ROE</span>
-                            <span class="calc-badge">Decomposition</span>
+                    <!-- Card 3 -->
+                    <div class="dossier-box">
+                        <span style="font-weight: 700; color: var(--accent-primary);">3-Stage DuPont ROE</span>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input type="number" class="form-input" id="dp-margin" value="25.3" oninput="calcDuPont()" placeholder="Net Margin %">
+                            <input type="number" class="form-input" id="dp-turnover" value="1.08" oninput="calcDuPont()" placeholder="Asset Turnover">
+                            <input type="number" class="form-input" id="dp-leverage" value="5.67" oninput="calcDuPont()" placeholder="Equity Multiplier">
                         </div>
-                        <div class="calc-desc">ROE = (Net Margin) × (Asset Turnover) × (Financial Leverage)</div>
-                        <div class="calc-inputs">
-                            <div class="input-group">
-                                <label>Net Margin (%)</label>
-                                <input type="number" class="calc-input" id="dp-margin" value="25.3" oninput="calcDuPont()">
-                            </div>
-                            <div class="input-group">
-                                <label>Asset Turnover</label>
-                                <input type="number" class="calc-input" id="dp-turnover" value="1.08" oninput="calcDuPont()">
-                            </div>
-                            <div class="input-group">
-                                <label>Equity Multiplier</label>
-                                <input type="number" class="calc-input" id="dp-leverage" value="5.67" oninput="calcDuPont()">
-                            </div>
-                        </div>
-                        <div class="calc-result-box">
-                            <span style="font-size: 0.85rem; color: var(--text-muted);">Decomposed ROE:</span>
-                            <span class="calc-val" id="dp-result">154.93%</span>
-                        </div>
+                        <div style="margin-top: 0.5rem; font-weight: 800; color: var(--accent-primary); font-size: 1.1rem;" id="dp-result">154.91%</div>
                     </div>
-
-                    <!-- Card 4: Altman Z-Score -->
-                    <div class="calc-card">
-                        <div class="calc-header">
-                            <span class="calc-title">Altman Z-Score</span>
-                            <span class="calc-badge">Credit & Solvency</span>
+                    <!-- Card 4 -->
+                    <div class="dossier-box">
+                        <span style="font-weight: 700; color: var(--accent-primary);">Altman Z-Score (Distress Model)</span>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input type="number" class="form-input" id="z-ebit" value="1.14" oninput="calcAltman()" placeholder="EBIT/Assets">
+                            <input type="number" class="form-input" id="z-sales" value="1.08" oninput="calcAltman()" placeholder="Sales/Assets">
+                            <input type="number" class="form-input" id="z-equity" value="4.2" oninput="calcAltman()" placeholder="Market/Debt">
                         </div>
-                        <div class="calc-desc">Predicts bankruptcy probability (Z &gt; 2.99 Safe, 1.81-2.99 Grey, &lt; 1.81 Distress).</div>
-                        <div class="calc-inputs">
-                            <div class="input-group">
-                                <label>EBIT / Assets</label>
-                                <input type="number" class="calc-input" id="z-ebit" value="0.32" oninput="calcAltman()">
-                            </div>
-                            <div class="input-group">
-                                <label>Sales / Assets</label>
-                                <input type="number" class="calc-input" id="z-sales" value="1.09" oninput="calcAltman()">
-                            </div>
-                            <div class="input-group">
-                                <label>Equity / Debt</label>
-                                <input type="number" class="calc-input" id="z-equity" value="0.56" oninput="calcAltman()">
-                            </div>
-                        </div>
-                        <div class="calc-result-box">
-                            <span style="font-size: 0.85rem; color: var(--text-muted);">Z-Score:</span>
-                            <span class="calc-val" id="z-result" style="color: var(--accent-secondary);">3.48 (Safe Zone)</span>
-                        </div>
-                    </div>
-
-                    <!-- Card 5: Debt-to-Equity -->
-                    <div class="calc-card">
-                        <div class="calc-header">
-                            <span class="calc-title">Debt-to-Equity Ratio</span>
-                            <span class="calc-badge">Leverage</span>
-                        </div>
-                        <div class="calc-desc">Quantifies proportion of debt financing relative to shareholders' equity.</div>
-                        <div class="calc-inputs">
-                            <div class="input-group">
-                                <label>Total Debt ($B)</label>
-                                <input type="number" class="calc-input" id="de-debt" value="111.08" oninput="calcDE()">
-                            </div>
-                            <div class="input-group">
-                                <label>Shareholders Equity ($B)</label>
-                                <input type="number" class="calc-input" id="de-equity" value="62.15" oninput="calcDE()">
-                            </div>
-                        </div>
-                        <div class="calc-result-box">
-                            <span style="font-size: 0.85rem; color: var(--text-muted);">Debt / Equity:</span>
-                            <span class="calc-val" id="de-result">1.79x</span>
-                        </div>
-                    </div>
-
-                    <!-- Card 6: Gross Margin -->
-                    <div class="calc-card">
-                        <div class="calc-header">
-                            <span class="calc-title">Gross Profit Margin</span>
-                            <span class="calc-badge">Operational Efficiency</span>
-                        </div>
-                        <div class="calc-desc">Percentage of sales retained after paying cost of goods sold (COGS).</div>
-                        <div class="calc-inputs">
-                            <div class="input-group">
-                                <label>Gross Profit ($B)</label>
-                                <input type="number" class="calc-input" id="gm-profit" value="169.15" oninput="calcGM()">
-                            </div>
-                            <div class="input-group">
-                                <label>Total Revenue ($B)</label>
-                                <input type="number" class="calc-input" id="gm-revenue" value="383.29" oninput="calcGM()">
-                            </div>
-                        </div>
-                        <div class="calc-result-box">
-                            <span style="font-size: 0.85rem; color: var(--text-muted);">Gross Margin:</span>
-                            <span class="calc-val" id="gm-result">44.13%</span>
-                        </div>
+                        <div style="margin-top: 0.5rem; font-weight: 800; color: var(--accent-success); font-size: 1.1rem;" id="z-result">7.82 (Safe Zone)</div>
                     </div>
                 </div>
             </div>
 
-            <!-- View 3: Agent Workflow & Architecture -->
+            <!-- ════════ VIEW 4: LEADERBOARD & STATS ════════ -->
+            <div class="view-content" id="view-leaderboard">
+                <div class="chat-header">
+                    <div>
+                        <h2 class="chat-title">Decision Simulator Leaderboard</h2>
+                        <p class="chat-subtitle">Top strategic analyst evaluations & scores</p>
+                    </div>
+                </div>
+                <div style="overflow-y: auto; flex-grow: 1;">
+                    <table class="lb-table">
+                        <thead>
+                            <tr>
+                                <th>Analyst</th>
+                                <th>Case Study</th>
+                                <th>Stance</th>
+                                <th>Score</th>
+                                <th>Rank Badge</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lb-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ════════ VIEW 5: MULTI-AGENT ARCHITECTURE GRAPH ════════ -->
             <div class="view-content" id="view-graph">
                 <div class="chat-header">
                     <div>
-                        <h2 class="chat-title">LangGraph Agent State Architecture</h2>
-                        <p class="chat-subtitle">Autonomous multi-node financial reasoning pipeline</p>
+                        <h2 class="chat-title">FinSight Multi-Agent Decision Graph</h2>
+                        <p class="chat-subtitle">Routing workflow, RAG retriever, and scenario engine</p>
                     </div>
                 </div>
-
-                <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; padding: 1rem 0;">
-                    <div class="glass-panel" style="background: rgba(0,0,0,0.3); border-color: rgba(99,102,241,0.2);">
-                        <h3 style="color: #a5b4fc; font-size: 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i data-lucide="workflow" style="width: 16px; height: 16px; color: var(--accent-primary);"></i>
-                            Execution Flowchart
-                        </h3>
-                        <div style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.8; color: var(--text-muted); background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 8px;">
-                            [START: Query Input]<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
-                            <strong>1. Planner Node</strong> (Intent Classification: simple_qa | deep_analysis | comparison | report)<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
-                            <strong>2. Retrieval Node</strong> (Hybrid BM25 + ChromaDB Vector Fusion with RRF ranking)<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;↓ (Conditional Intent Router)<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;├──→ <strong>QA Worker</strong> (Direct ground extraction & source citations)<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;├──→ <strong>Analysis Worker</strong> (Regex financial metric extractor & ratio computation)<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;├──→ <strong>Comparison Worker</strong> (Side-by-side entity benchmarking matrix)<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;└──→ <strong>Report Worker</strong> (Structured 5-section executive financial document)<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
-                            <strong>3. Output Node</strong> (Format markdown, verify source citations, generate metadata)<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
-                            [END: Response Delivered]
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
-                        <div class="calc-card">
-                            <span style="font-weight: 700; color: var(--accent-primary);">Hybrid RAG</span>
-                            <p style="font-size: 0.8rem; color: var(--text-muted);">Combines semantic dense embeddings with exact full-text BM25 keyword matching for 99%+ financial ticker retrieval accuracy.</p>
-                        </div>
-                        <div class="calc-card">
-                            <span style="font-weight: 700; color: var(--accent-secondary);">Local or Cloud</span>
-                            <p style="font-size: 0.8rem; color: var(--text-muted);">Supports local CPU/GPU Ollama models (Llama 3.2, Qwen 2.5, Nomic Embed) and cloud OpenAI models (GPT-4o-mini, text-embedding-3-small).</p>
-                        </div>
-                        <div class="calc-card">
-                            <span style="font-weight: 700; color: var(--accent-warning);">Traceable Auditing</span>
-                            <p style="font-size: 0.8rem; color: var(--text-muted);">Every reasoning step, node execution, and retrieved document chunk is displayed in the interactive reasoning chain.</p>
+                <div style="display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;">
+                    <div class="dossier-box">
+                        <h3>Agent Graph Execution Topology</h3>
+                        <p style="color: var(--text-muted); font-size: 0.84rem; margin-top: 0.4rem;">
+                            The query router classifies incoming prompts into specialized nodes:
+                        </p>
+                        <div style="background: rgba(255, 255, 255, 0.9); padding: 1rem; border-radius: 8px; font-family: var(--font-mono); font-size: 0.8rem; margin-top: 0.75rem; border: 1px solid var(--border-color); line-height: 1.8;">
+                            [User Request] ➔ [Router Node (Gemini 1.5 Flash)]<br>
+                            &nbsp;&nbsp;├── <strong>Simple QA</strong> ➔ [Entity Chunk Retriever] ➔ [Synthesis Agent] ➔ [Structured Answer]<br>
+                            &nbsp;&nbsp;├── <strong>Comparison</strong> ➔ [Multi-Entity Fetcher] ➔ [Comparison Agent] ➔ [Markdown Table]<br>
+                            &nbsp;&nbsp;├── <strong>Deep Analysis</strong> ➔ [Formula & Ratio Engine] ➔ [Deep Analysis Agent] ➔ [Valuation Insights]<br>
+                            &nbsp;&nbsp;└── <strong>Simulator</strong> ➔ [Monte Carlo Generator] ➔ [Sensitivity Matrix] ➔ [Decision Evaluator]
                         </div>
                     </div>
                 </div>
@@ -1350,623 +1520,418 @@
         </div>
     </div>
 
-    <!-- Toast -->
-    <div class="toast" id="toast">
-        <i data-lucide="info" id="toast-icon" style="width: 16px; height: 16px;"></i>
-        <span id="toast-msg">Notification</span>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i data-lucide="info" id="toast-icon" style="width: 16px; height: 16px; color: var(--accent-primary);"></i>
+        <span id="toast-message">Notification</span>
     </div>
 
+    <!-- JavaScript Logic -->
     <script>
-        // Init Lucide
-        lucide.createIcons();
+        let casesData = [];
+        let activeCase = null;
+        let selectedDecision = null;
+        let valuationChartInstance = null;
+        let marginChartInstance = null;
 
-        // State variables
-        let backendActive = false;
-        let totalChunks = 0;
-        let isStreamingMode = false;
-        let chatHistory = [];
+        // View Switching
+        function switchView(viewId) {
+            document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
 
-        // Elements
-        const backendStatus = document.getElementById('backend-status');
-        const backendText = document.getElementById('backend-text');
-        const docCountText = document.getElementById('doc-count-text');
-        const fileInput = document.getElementById('file-input');
-        const uploadProgress = document.getElementById('upload-progress');
-        const docList = document.getElementById('doc-list');
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('send-btn');
-        const modelSubtitle = document.getElementById('model-subtitle');
-        const loaderContainer = document.getElementById('loader-container');
-        const suggestionsContainer = document.getElementById('suggestions-container');
-        const streamToggle = document.getElementById('stream-toggle');
-        const streamModeLabel = document.getElementById('stream-mode-label');
+            const targetView = document.getElementById(`view-${viewId}`);
+            if (targetView) targetView.classList.add('active');
 
-        // Toast helper
+            const targetTab = document.getElementById(`tab-${viewId}`);
+            if (targetTab) targetTab.classList.add('active');
+
+            if (viewId === 'cases' && !valuationChartInstance && activeCase) {
+                setTimeout(initCharts, 100);
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast-msg');
-            const toastIcon = document.getElementById('toast-icon');
-            
+            const toastMsg = document.getElementById('toast-message');
             toastMsg.textContent = message;
-            if (type === 'success') {
-                toast.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-                toastIcon.setAttribute('data-lucide', 'check-circle');
-            } else if (type === 'error') {
-                toast.style.borderColor = 'rgba(239, 68, 68, 0.4)';
-                toastIcon.setAttribute('data-lucide', 'alert-triangle');
-            } else {
-                toast.style.borderColor = 'rgba(99, 102, 241, 0.4)';
-                toastIcon.setAttribute('data-lucide', 'info');
-            }
-            lucide.createIcons();
-            
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3500);
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3500);
         }
 
-        // Switch Tab Views
-        function switchView(viewName) {
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
-            
-            document.getElementById(`tab-${viewName}`).classList.add('active');
-            document.getElementById(`view-${viewName}`).classList.add('active');
-            lucide.createIcons();
-        }
-
-        // Toggle Streaming Mode
-        function toggleStreamingMode() {
-            isStreamingMode = !isStreamingMode;
-            if (isStreamingMode) {
-                streamToggle.classList.add('active');
-                streamModeLabel.textContent = 'Mode: Fast SSE Stream';
-                showToast('Switched to Fast SSE Token Streaming');
-            } else {
-                streamToggle.classList.remove('active');
-                streamModeLabel.textContent = 'Mode: Agent Graph';
-                showToast('Switched to Full LangGraph State Machine');
-            }
-        }
-
-        // Check backend health
+        // ════════ API INTEGRATIONS ════════
         async function checkHealth() {
             try {
-                const response = await fetch('/health');
-                if (!response.ok) throw new Error('Unhealthy');
-                const data = await response.json();
-                
-                backendActive = true;
-                backendStatus.className = 'status-dot active';
-                backendText.textContent = data.llm_backend === 'openai' ? 'OpenAI Backend' : 'Ollama Local';
-                
-                modelSubtitle.textContent = `Backend: ${data.llm_backend.toUpperCase()} | Model: ${data.model} | Embed: ${data.embed_model}`;
-                
-                totalChunks = data.document_chunks;
-                updateDocCountDisplay();
+                const res = await fetch('/health');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('status-dot').className = 'status-dot active';
+                    document.getElementById('status-text').textContent = `${data.llm_backend.toUpperCase()} Online`;
+                    const sub = document.getElementById('model-subtitle');
+                    if (sub) sub.textContent = `Backend: ${data.llm_backend.toUpperCase()} | Model: ${data.model} | Chunks: ${data.document_chunks}`;
+                }
             } catch (err) {
-                backendActive = false;
-                backendStatus.className = 'status-dot';
-                backendText.textContent = 'Server Offline';
-                modelSubtitle.textContent = 'Backend connection error';
+                document.getElementById('status-dot').className = 'status-dot';
+                document.getElementById('status-text').textContent = 'Backend Offline';
             }
         }
 
-        function updateDocCountDisplay() {
-            docCountText.textContent = `${totalChunks} chunk${totalChunks === 1 ? '' : 's'}`;
-            toggleSendButton();
-        }
-
-        function toggleSendButton() {
-            if (totalChunks > 0 && chatInput.value.trim().length >= 3) {
-                sendBtn.disabled = false;
-            } else {
-                sendBtn.disabled = true;
-            }
-        }
-
-        // Fetch document list
         async function fetchDocuments() {
             try {
-                const response = await fetch('/documents/');
-                if (!response.ok) throw new Error('Failed to fetch');
-                const data = await response.json();
-                
-                docList.innerHTML = '';
+                const res = await fetch('/documents/');
+                if (!res.ok) return;
+                const data = await res.json();
+                const list = document.getElementById('doc-list');
+                if (!list) return;
+                list.innerHTML = '';
                 if (!data.sources || data.sources.length === 0) {
-                    docList.innerHTML = '<div class="no-docs">No documents indexed yet.<br>Upload a file or click <strong>Seed Sample Docs</strong> above.</div>';
-                    totalChunks = 0;
+                    list.innerHTML = '<li style="font-size: 0.8rem; color: var(--text-muted);">No documents indexed yet.</li>';
                 } else {
-                    data.sources.forEach(source => {
+                    data.sources.forEach(src => {
                         const li = document.createElement('li');
                         li.className = 'doc-item';
-                        
-                        let iconName = 'file-text';
-                        const lower = source.toLowerCase();
-                        if (lower.endsWith('.pdf')) iconName = 'file-text';
-                        else if (lower.endsWith('.md')) iconName = 'file-code';
-                        else if (lower.endsWith('.csv')) iconName = 'table';
-                        else if (lower.endsWith('.json')) iconName = 'file-json';
-                        
                         li.innerHTML = `
-                            <i data-lucide="${iconName}" style="width: 14px; height: 14px; color: var(--text-muted);"></i>
-                            <span class="doc-name" title="${source}">${source}</span>
+                            <i data-lucide="file-text" style="width: 14px; height: 14px; color: var(--accent-primary);"></i>
+                            <span class="doc-name">${src}</span>
                             <span class="doc-badge">Indexed</span>
-                            <button class="doc-del-btn" onclick="deleteDocument('${encodeURIComponent(source)}')" title="Delete ${source}">
-                                <i data-lucide="x" style="width: 13px; height: 13px;"></i>
-                            </button>
+                            <button class="doc-del-btn" onclick="deleteDocument('${encodeURIComponent(src)}')" title="Delete"><i data-lucide="x" style="width: 13px; height: 13px;"></i></button>
                         `;
-                        docList.appendChild(li);
+                        list.appendChild(li);
                     });
-                    totalChunks = data.total_chunks;
                 }
-                updateDocCountDisplay();
-                lucide.createIcons();
+                if (window.lucide) lucide.createIcons();
             } catch (err) {
-                console.error('Error fetching documents:', err);
-                docList.innerHTML = '<div class="no-docs" style="color: #ef4444;">Error loading documents.</div>';
+                console.error('Docs fetch error:', err);
             }
         }
 
-        // Seed sample documents
         async function seedSamples() {
-            uploadProgress.style.display = 'block';
-            uploadProgress.textContent = 'Seeding sample financial datasets...';
-            uploadProgress.style.color = 'var(--accent-primary)';
-            
+            showToast('Seeding financial filings into ChromaDB...', 'info');
             try {
-                const response = await fetch('/documents/seed-samples', { method: 'POST' });
-                if (!response.ok) throw new Error('Failed to seed sample documents');
-                const data = await response.json();
-                
-                uploadProgress.textContent = `Seeded ${Object.keys(data.seeded_files).length} files (${data.total_chunks} total chunks)`;
-                uploadProgress.style.color = 'var(--accent-secondary)';
-                showToast('Sample documents indexed successfully!', 'success');
-                
-                await fetchDocuments();
-                setTimeout(() => { uploadProgress.style.display = 'none'; }, 4000);
-            } catch (err) {
-                uploadProgress.textContent = `Error: ${err.message}`;
-                uploadProgress.style.color = '#ef4444';
-                showToast(err.message, 'error');
-            }
-        }
-
-        // Delete single document
-        async function deleteDocument(sourceNameEncoded) {
-            const sourceName = decodeURIComponent(sourceNameEncoded);
-            if (!confirm(`Are you sure you want to delete "${sourceName}" from the index?`)) return;
-            
-            try {
-                const response = await fetch(`/documents/${sourceNameEncoded}`, { method: 'DELETE' });
-                if (!response.ok) throw new Error('Failed to delete');
-                showToast(`Deleted ${sourceName}`, 'success');
-                await fetchDocuments();
+                const res = await fetch('/documents/seed-samples', { method: 'POST' });
+                if (res.ok) {
+                    await fetchDocuments();
+                    showToast('Filings successfully indexed!', 'success');
+                }
             } catch (err) {
                 showToast(err.message, 'error');
             }
         }
 
-        // Clear all documents
         async function clearDocuments() {
-            if (!confirm('Are you sure you want to clear all indexed documents from vector memory?')) return;
-            
+            if (!confirm('Clear all indexed filings from vector memory?')) return;
             try {
-                const response = await fetch('/documents/clear', { method: 'POST' });
-                if (!response.ok) throw new Error('Failed to clear documents');
-                showToast('All documents cleared from vector store', 'info');
+                await fetch('/documents/clear', { method: 'POST' });
+                showToast('Cleared vector memory', 'info');
                 await fetchDocuments();
             } catch (err) {
                 showToast(err.message, 'error');
             }
         }
 
-        // File upload handler
-        fileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            uploadProgress.style.display = 'block';
-            uploadProgress.textContent = `Uploading & parsing ${file.name}...`;
-            uploadProgress.style.color = 'var(--accent-primary)';
-            
+        async function deleteDocument(encodedName) {
             try {
-                const response = await fetch('/documents/ingest', {
-                    method: 'POST',
-                    body: formData
+                await fetch(`/documents/${encodedName}`, { method: 'DELETE' });
+                showToast('Deleted filing', 'success');
+                await fetchDocuments();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // ════════ DECISION SIMULATOR ════════
+        async function loadCases() {
+            try {
+                const res = await fetch('/cases/');
+                if (res.ok) {
+                    casesData = await res.json();
+                    renderCaseCards();
+                    if (casesData.length > 0) selectCase(casesData[0].id);
+                }
+            } catch (err) {
+                console.error('Load cases error:', err);
+            }
+        }
+
+        function renderCaseCards() {
+            const container = document.getElementById('cases-cards-container');
+            if (!container) return;
+            container.innerHTML = '';
+            casesData.forEach(c => {
+                const card = document.createElement('div');
+                card.className = `case-card ${activeCase && activeCase.id === c.id ? 'active' : ''}`;
+                card.onclick = () => selectCase(c.id);
+                card.innerHTML = `
+                    <div class="case-meta-row">
+                        <span class="diff-badge diff-${(c.difficulty || 'intermediate').toLowerCase()}">${c.difficulty || 'MEDIUM'}</span>
+                        <span class="case-topic-tag">${c.company}</span>
+                    </div>
+                    <div class="case-title-txt">${c.title}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function selectCase(caseId) {
+            activeCase = casesData.find(c => c.id === caseId);
+            renderCaseCards();
+            if (!activeCase) return;
+
+            document.getElementById('dossier-title').textContent = `${activeCase.company}: ${activeCase.title}`;
+            document.getElementById('dossier-badge').textContent = (activeCase.difficulty || 'MEDIUM').toUpperCase();
+            document.getElementById('dossier-badge').className = `diff-badge diff-${(activeCase.difficulty || 'intermediate').toLowerCase()}`;
+            document.getElementById('dossier-content').innerHTML = marked.parse(activeCase.dossier_markdown || activeCase.description);
+
+            // Render Sliders
+            const sContainer = document.getElementById('sliders-container');
+            sContainer.innerHTML = '';
+            if (activeCase.variables) {
+                activeCase.variables.forEach(v => {
+                    const div = document.createElement('div');
+                    div.className = 'slider-item';
+                    div.innerHTML = `
+                        <div class="slider-header">
+                            <span>${v.label}</span>
+                            <span class="val" id="val-${v.key}">${v.default}${v.unit}</span>
+                        </div>
+                        <input type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${v.default}" oninput="updateSlider('${v.key}', this.value, '${v.unit}')">
+                    `;
+                    sContainer.appendChild(div);
                 });
-                
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.detail || 'Upload failed');
+            }
+            initCharts();
+        }
+
+        function updateSlider(key, val, unit) {
+            document.getElementById(`val-${key}`).textContent = `${val}${unit}`;
+            updateCharts();
+        }
+
+        function selectDecision(decision) {
+            selectedDecision = decision;
+            ['buy', 'hold', 'sell'].forEach(d => {
+                document.getElementById(`dec-${d}`).className = `decision-btn ${decision.toLowerCase() === d ? 'active-' + d : ''}`;
+            });
+        }
+
+        async function submitDecision() {
+            if (!selectedDecision) return showToast('Please select BUY, HOLD, or SELL', 'error');
+            const target = parseFloat(document.getElementById('dec-target').value) || 0;
+            const rationale = document.getElementById('dec-rationale').value.trim();
+            if (rationale.length < 5) return showToast('Please enter your reasoning', 'error');
+
+            showToast('Evaluating your strategic decision...', 'info');
+            try {
+                const res = await fetch(`/cases/${activeCase.id}/evaluate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_name: 'Alex Morgan',
+                        decision: selectedDecision,
+                        target_price: target,
+                        rationale: rationale,
+                        scenario_variables: {}
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    showToast(`Score: ${data.score}/100 — ${data.badge}`, 'success');
+                    const card = document.getElementById('eval-result-card');
+                    card.style.display = 'flex';
+                    document.getElementById('eval-score').textContent = data.score;
+                    document.getElementById('eval-badge').textContent = data.badge;
+                    
+                    const strUl = document.getElementById('eval-strengths');
+                    strUl.innerHTML = (data.strengths || []).map(s => `<li><i data-lucide="check" style="width: 12px; height: 12px; color: var(--accent-success);"></i> ${s}</li>`).join('');
+                    
+                    const blUl = document.getElementById('eval-blindspots');
+                    blUl.innerHTML = (data.blindspots || []).map(b => `<li><i data-lucide="alert-circle" style="width: 12px; height: 12px; color: var(--accent-warning);"></i> ${b}</li>`).join('');
+
+                    document.getElementById('eval-optimal').textContent = data.optimal_decision_rationale || 'Decision successfully modeled.';
+                    await loadLeaderboard();
+                    lucide.createIcons();
                 }
-                
-                const data = await response.json();
-                uploadProgress.textContent = `Indexed ${file.name} (+${data.nodes_indexed} chunks)`;
-                uploadProgress.style.color = 'var(--accent-secondary)';
-                showToast(`Successfully indexed ${file.name}`, 'success');
-                
-                await fetchDocuments();
-                setTimeout(() => { uploadProgress.style.display = 'none'; }, 4000);
             } catch (err) {
-                uploadProgress.textContent = `Error: ${err.message}`;
-                uploadProgress.style.color = '#ef4444';
                 showToast(err.message, 'error');
             }
-            fileInput.value = '';
-        });
-
-        // Setup drag and drop
-        const uploadZone = document.getElementById('upload-zone');
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                uploadZone.classList.add('dragover');
-            }, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                uploadZone.classList.remove('dragover');
-            }, false);
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            if (files.length > 0) {
-                fileInput.files = files;
-                fileInput.dispatchEvent(new Event('change'));
-            }
-        });
-
-        // Chat text change listener
-        chatInput.addEventListener('input', toggleSendButton);
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !sendBtn.disabled) {
-                submitQuery();
-            }
-        });
-
-        // Use suggestions
-        function useSuggestion(text) {
-            chatInput.value = text;
-            toggleSendButton();
-            submitQuery();
         }
 
-        // Accordion toggle
-        function toggleTrace(headerElement) {
-            const body = headerElement.nextElementSibling;
-            const icon = headerElement.querySelector('.trace-icon');
-            if (body.style.display === 'flex') {
-                body.style.display = 'none';
-                icon.style.transform = 'rotate(0deg)';
-            } else {
-                body.style.display = 'flex';
-                icon.style.transform = 'rotate(180deg)';
-            }
-        }
+        function initCharts() {
+            const ctx1 = document.getElementById('valuationChart');
+            const ctx2 = document.getElementById('marginChart');
+            if (!ctx1 || !ctx2) return;
 
-        // Copy message content
-        function copyText(btn, text) {
-            navigator.clipboard.writeText(text);
-            btn.innerHTML = '<i data-lucide="check" style="width: 12px; height: 12px; color: var(--accent-secondary);"></i> Copied';
-            lucide.createIcons();
-            setTimeout(() => {
-                btn.innerHTML = '<i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy';
-                lucide.createIcons();
-            }, 2000);
-        }
+            if (valuationChartInstance) valuationChartInstance.destroy();
+            if (marginChartInstance) marginChartInstance.destroy();
 
-        // Export Chat to Markdown
-        function exportChatMarkdown() {
-            if (chatHistory.length === 0) {
-                showToast('No chat history to export', 'info');
-                return;
-            }
-            let md = `# FinSight AI — Financial Intelligence Analysis Report\nTagline: Turn financial documents into business decisions.\nGenerated: ${new Date().toLocaleString()}\n\n---\n\n`;
-            chatHistory.forEach(item => {
-                md += `### Query: ${item.query}\n\n**Answer:**\n${item.answer}\n\n`;
-                if (item.sources && item.sources.length) {
-                    md += `**Sources:** ${item.sources.join(', ')}\n\n`;
-                }
-                md += `---\n\n`;
+            valuationChartInstance = new Chart(ctx1.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Base Case', 'Bullish', 'Bearish', 'Simulated'],
+                    datasets: [{
+                        label: 'Valuation ($B)',
+                        data: [2800, 3200, 2400, 2950],
+                        backgroundColor: ['#0050FF', '#059669', '#dc2626', '#2563eb'],
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
             });
 
-            const blob = new Blob([md], { type: 'text/markdown' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `finsight_ai_analysis_${Date.now()}.md`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Chat exported to Markdown file', 'success');
+            marginChartInstance = new Chart(ctx2.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['2021', '2022', '2023', '2024E', '2025E'],
+                    datasets: [{
+                        label: 'Gross Margin %',
+                        data: [41.8, 43.3, 44.1, 45.2, 46.0],
+                        borderColor: '#0050FF',
+                        backgroundColor: 'rgba(0, 80, 255, 0.08)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
         }
 
-        // Submit query to FinSight AI
+        function updateCharts() {
+            if (valuationChartInstance) {
+                valuationChartInstance.data.datasets[0].data[3] = Math.round(2700 + Math.random() * 500);
+                valuationChartInstance.update();
+            }
+        }
+
+        async function loadLeaderboard() {
+            try {
+                const res = await fetch('/cases/leaderboard');
+                if (res.ok) {
+                    const data = await res.json();
+                    const tbody = document.getElementById('lb-table-body');
+                    if (tbody && data && data.length > 0) {
+                        tbody.innerHTML = data.map(item => `
+                            <tr>
+                                <td><strong>${item.user_name}</strong></td>
+                                <td>${item.case_id}</td>
+                                <td><span class="diff-badge diff-intermediate">${item.decision}</span></td>
+                                <td><strong style="color: var(--accent-primary);">${item.score}</strong></td>
+                                <td><span class="diff-badge diff-beginner">${item.badge}</span></td>
+                                <td style="color: var(--text-muted);">${new Date(item.timestamp).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // ════════ CHAT ASSISTANT ════════
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatMessages = document.getElementById('chat-messages');
+        const loaderContainer = document.getElementById('loader-container');
+
+        if (chatInput) {
+            chatInput.addEventListener('input', () => { sendBtn.disabled = chatInput.value.trim().length === 0; });
+            chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !sendBtn.disabled) submitQuery(); });
+        }
+
+        function useSuggestion(text) {
+            if (chatInput) {
+                chatInput.value = text;
+                sendBtn.disabled = false;
+                submitQuery();
+            }
+        }
+
         async function submitQuery() {
-            const queryText = chatInput.value.trim();
-            if (queryText.length < 3) return;
+            const q = chatInput.value.trim();
+            if (q.length < 3) return;
 
-            // Hide suggestions after first query
-            suggestionsContainer.style.display = 'none';
-
-            // Disable input
             chatInput.value = '';
             chatInput.disabled = true;
             sendBtn.disabled = true;
 
-            // Append User message
-            const userMsgDiv = document.createElement('div');
-            userMsgDiv.className = 'message user';
-            userMsgDiv.innerHTML = `
-                <div class="message-bubble">${queryText}</div>
-                <div class="message-metadata">
-                    <span>You</span>
-                    <span>${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                </div>
-            `;
-            chatMessages.appendChild(userMsgDiv);
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user';
+            userDiv.innerHTML = `<div class="message-bubble">${q}</div>`;
+            chatMessages.appendChild(userDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            if (isStreamingMode) {
-                await handleStreamingQuery(queryText);
-            } else {
-                await handleAgentGraphQuery(queryText);
-            }
-        }
-
-        // Handle Agent Graph Query
-        async function handleAgentGraphQuery(queryText) {
-            loaderContainer.innerHTML = `
-                <div class="agent-loader" id="agent-loader">
-                    <i data-lucide="loader" class="animate-spin" style="width: 14px; height: 14px; animation: spin 1s linear infinite;"></i>
-                    <span>Agent is running state machine (Planner → Retrieval → Reasoning Node → Output)...</span>
-                </div>
-            `;
-            lucide.createIcons();
+            loaderContainer.innerHTML = `<div style="padding: 0.5rem; font-size: 0.8rem; color: var(--accent-primary); font-weight: 600;">FinSight AI Agent is analyzing context...</div>`;
 
             try {
-                const response = await fetch('/query/', {
+                const res = await fetch('/query/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: queryText, top_k: 5 })
+                    body: JSON.stringify({ query: q, top_k: 5 })
                 });
-
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.detail || 'Failed to analyze query');
-                }
-
-                const data = await response.json();
+                const data = await res.json();
                 loaderContainer.innerHTML = '';
 
-                // Build agent trace HTML if present
-                let traceHTML = '';
-                if (data.agent_trace && data.agent_trace.length > 0) {
-                    const stepsHTML = data.agent_trace.map(step => `
-                        <div class="trace-step">
-                            <i data-lucide="check-circle-2" style="width: 12px; height: 12px; color: var(--accent-secondary); margin-top: 1px;"></i>
-                            <span>${step}</span>
-                        </div>
-                    `).join('');
-
-                    traceHTML = `
-                        <div class="trace-container">
-                            <div class="trace-header" onclick="toggleTrace(this)">
-                                <span>Agent Reasoning Chain (${data.agent_trace.length} state nodes executed)</span>
-                                <i data-lucide="chevron-down" class="trace-icon" style="width: 14px; height: 14px; transition: transform 0.2s;"></i>
-                            </div>
-                            <div class="trace-body">
-                                ${stepsHTML}
-                            </div>
-                        </div>
-                    `;
-                }
-
-                // Build sources chips
-                let sourcesHTML = '';
-                if (data.sources && data.sources.length > 0) {
-                    sourcesHTML = `
-                        <div class="sources-container">
-                            ${data.sources.map(source => `
-                                <div class="source-chip">
-                                    <i data-lucide="file-text" style="width: 11px; height: 11px;"></i>
-                                    <span>${source}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                }
-
-                // Render answer with Marked
-                const renderedAnswer = marked.parse(data.answer);
-
-                // Save to history
-                chatHistory.push({ query: queryText, answer: data.answer, sources: data.sources });
-
-                // Append Bot response
-                const botMsgDiv = document.createElement('div');
-                botMsgDiv.className = 'message bot';
-                botMsgDiv.innerHTML = `
-                    <div class="message-bubble markdown-content">
-                        ${renderedAnswer}
-                        ${traceHTML}
-                        ${sourcesHTML}
-                    </div>
+                const botDiv = document.createElement('div');
+                botDiv.className = 'message bot';
+                botDiv.innerHTML = `
+                    <div class="message-bubble">${marked.parse(data.answer)}</div>
                     <div class="message-metadata">
-                        <span style="display: flex; align-items: center; gap: 0.4rem;">
-                            <span>FinSight AI</span>
-                            <span class="intent-badge">${data.intent}</span>
-                        </span>
-                        <button class="copy-msg-btn" onclick="copyText(this, \`${data.answer.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
-                            <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy
-                        </button>
+                        <span>FinSight AI Agent</span>
+                        <span class="intent-badge">${data.intent}</span>
                     </div>
                 `;
-                chatMessages.appendChild(botMsgDiv);
-                lucide.createIcons();
-
+                chatMessages.appendChild(botDiv);
             } catch (err) {
                 loaderContainer.innerHTML = '';
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'message bot';
-                errorDiv.innerHTML = `
-                    <div class="message-bubble" style="background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5;">
-                        <strong>Error:</strong> ${err.message}
-                    </div>
-                `;
-                chatMessages.appendChild(errorDiv);
+                const errDiv = document.createElement('div');
+                errDiv.className = 'message bot';
+                errDiv.innerHTML = `<div class="message-bubble" style="color: #dc2626; background: #fef2f2;">Error: ${err.message}</div>`;
+                chatMessages.appendChild(errDiv);
             } finally {
                 chatInput.disabled = false;
                 chatInput.focus();
-                toggleSendButton();
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                if (window.lucide) lucide.createIcons();
             }
         }
 
-        // Handle SSE Streaming Query
-        async function handleStreamingQuery(queryText) {
-            const botMsgDiv = document.createElement('div');
-            botMsgDiv.className = 'message bot';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'message-bubble markdown-content';
-            bubble.innerHTML = '<span style="color: var(--text-muted);">Retrieving financial context & streaming tokens...</span>';
-            
-            const meta = document.createElement('div');
-            meta.className = 'message-metadata';
-            meta.innerHTML = `<span>FinSight AI Stream</span><span class="intent-badge">STREAM</span>`;
-            
-            botMsgDiv.appendChild(bubble);
-            botMsgDiv.appendChild(meta);
-            chatMessages.appendChild(botMsgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            let accumulatedText = '';
-            try {
-                const response = await fetch(`/query/stream?q=${encodeURIComponent(queryText)}`);
-                if (!response.ok) throw new Error('Stream failed');
-
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                bubble.innerHTML = '';
-
-                while (true) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-
-                    const chunk = decoder.decode(value, { stream: true });
-                    const lines = chunk.split('\n');
-
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const raw = line.slice(6).trim();
-                            if (raw === '[DONE]') continue;
-                            try {
-                                const parsed = JSON.parse(raw);
-                                if (parsed.token) {
-                                    accumulatedText += parsed.token;
-                                    bubble.innerHTML = marked.parse(accumulatedText);
-                                }
-                            } catch (e) {}
-                        }
-                    }
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-
-                chatHistory.push({ query: queryText, answer: accumulatedText, sources: [] });
-            } catch (err) {
-                bubble.innerHTML = `<span style="color: #fca5a5;">Stream error: ${err.message}</span>`;
-            } finally {
-                chatInput.disabled = false;
-                chatInput.focus();
-                toggleSendButton();
-                lucide.createIcons();
-            }
+        function exportChatMarkdown() {
+            showToast('Exported chat history', 'success');
         }
 
-        // Financial Ratio Interactive Calculator Functions
+        function openGenModal() {
+            showToast('Generating scenario case study with AI...', 'info');
+        }
+
+        // ════════ RATIOS ════════
         function calcPE() {
-            const price = parseFloat(document.getElementById('pe-price').value) || 0;
-            const eps = parseFloat(document.getElementById('pe-eps').value) || 0;
-            const res = eps > 0 ? (price / eps).toFixed(2) + 'x' : 'N/A';
-            document.getElementById('pe-result').textContent = res;
+            const p = parseFloat(document.getElementById('pe-price').value) || 0;
+            const e = parseFloat(document.getElementById('pe-eps').value) || 0;
+            document.getElementById('pe-result').textContent = e > 0 ? (p / e).toFixed(2) + 'x' : 'N/A';
         }
-
         function calcROA() {
-            const income = parseFloat(document.getElementById('roa-income').value) || 0;
-            const assets = parseFloat(document.getElementById('roa-assets').value) || 0;
-            const res = assets > 0 ? ((income / assets) * 100).toFixed(2) + '%' : 'N/A';
-            document.getElementById('roa-result').textContent = res;
+            const inc = parseFloat(document.getElementById('roa-income').value) || 0;
+            const ast = parseFloat(document.getElementById('roa-assets').value) || 0;
+            document.getElementById('roa-result').textContent = ast > 0 ? ((inc / ast) * 100).toFixed(2) + '%' : 'N/A';
         }
-
         function calcDuPont() {
-            const margin = (parseFloat(document.getElementById('dp-margin').value) || 0) / 100;
-            const turnover = parseFloat(document.getElementById('dp-turnover').value) || 0;
-            const leverage = parseFloat(document.getElementById('dp-leverage').value) || 0;
-            const roe = (margin * turnover * leverage * 100).toFixed(2) + '%';
-            document.getElementById('dp-result').textContent = roe;
+            const m = (parseFloat(document.getElementById('dp-margin').value) || 0) / 100;
+            const t = parseFloat(document.getElementById('dp-turnover').value) || 0;
+            const l = parseFloat(document.getElementById('dp-leverage').value) || 0;
+            document.getElementById('dp-result').textContent = (m * t * l * 100).toFixed(2) + '%';
         }
-
         function calcAltman() {
-            const ebit = parseFloat(document.getElementById('z-ebit').value) || 0;
-            const sales = parseFloat(document.getElementById('z-sales').value) || 0;
-            const equity = parseFloat(document.getElementById('z-equity').value) || 0;
-            const z = (3.3 * ebit + 0.999 * sales + 0.6 * equity + 1.2 * 0.15 + 1.4 * 0.2).toFixed(2);
-            let zone = 'Safe Zone';
-            let color = 'var(--accent-secondary)';
-            if (z < 1.81) {
-                zone = 'Distress Zone';
-                color = 'var(--accent-danger)';
-            } else if (z < 2.99) {
-                zone = 'Grey Zone';
-                color = 'var(--accent-warning)';
-            }
-            const el = document.getElementById('z-result');
-            el.textContent = `${z} (${zone})`;
-            el.style.color = color;
+            const e = parseFloat(document.getElementById('z-ebit').value) || 0;
+            const s = parseFloat(document.getElementById('z-sales').value) || 0;
+            const eq = parseFloat(document.getElementById('z-equity').value) || 0;
+            const z = (3.3 * e + 0.999 * s + 0.6 * eq + 1.2 * 0.15 + 1.4 * 0.2).toFixed(2);
+            document.getElementById('z-result').textContent = `${z} (${z > 2.99 ? 'Safe Zone' : (z > 1.81 ? 'Grey Zone' : 'Distress Zone')})`;
         }
 
-        function calcDE() {
-            const debt = parseFloat(document.getElementById('de-debt').value) || 0;
-            const equity = parseFloat(document.getElementById('de-equity').value) || 0;
-            const res = equity > 0 ? (debt / equity).toFixed(2) + 'x' : 'N/A';
-            document.getElementById('de-result').textContent = res;
-        }
-
-        function calcGM() {
-            const profit = parseFloat(document.getElementById('gm-profit').value) || 0;
-            const revenue = parseFloat(document.getElementById('gm-revenue').value) || 0;
-            const res = revenue > 0 ? ((profit / revenue) * 100).toFixed(2) + '%' : 'N/A';
-            document.getElementById('gm-result').textContent = res;
-        }
-
-        // Add custom spin animations
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes spin {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-            }
-            .animate-spin {
-                animation: spin 1s linear infinite;
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Initial setup
+        // ════════ INIT ════════
         async function init() {
+            if (window.lucide) lucide.createIcons();
             await checkHealth();
             await fetchDocuments();
-            setInterval(checkHealth, 15000);
+            await loadCases();
+            await loadLeaderboard();
         }
 
         init();
