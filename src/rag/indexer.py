@@ -44,12 +44,38 @@ def _get_embed_model() -> Any:
     cfg = get_settings()
     if cfg.llm_backend == "gemini" and cfg.gemini_api_key and not cfg.gemini_api_key.startswith("placeholder"):
         try:
-            from llama_index.embeddings.openai import OpenAIEmbedding
-            return OpenAIEmbedding(
-                model=cfg.gemini_embed_model,
-                api_key=cfg.gemini_api_key,
-                api_base="https://generativelanguage.googleapis.com/v1beta/openai/",
-            )
+            from llama_index.core.base.embeddings.base import BaseEmbedding
+
+            class GeminiLlamaEmbedding(BaseEmbedding):
+                def __init__(self, **kwargs: Any) -> None:
+                    super().__init__(**kwargs)
+
+                @classmethod
+                def class_name(cls) -> str:
+                    return "GeminiLlamaEmbedding"
+
+                def _get_query_embedding(self, query: str) -> list[float]:
+                    from src.llm.gemini_client import GeminiClient
+                    return GeminiClient().embed(query)
+
+                async def _aget_query_embedding(self, query: str) -> list[float]:
+                    return self._get_query_embedding(query)
+
+                def _get_text_embedding(self, text: str) -> list[float]:
+                    from src.llm.gemini_client import GeminiClient
+                    return GeminiClient().embed(text)
+
+                async def _aget_text_embedding(self, text: str) -> list[float]:
+                    return self._get_text_embedding(text)
+
+                def _get_text_embeddings(self, texts: list[str]) -> list[list[float]]:
+                    from src.llm.gemini_client import GeminiClient
+                    return GeminiClient().embed_batch(texts)
+
+                async def _aget_text_embeddings(self, texts: list[str]) -> list[list[float]]:
+                    return self._get_text_embeddings(texts)
+
+            return GeminiLlamaEmbedding()
         except Exception as exc:
             logger.warning(f"Gemini embedding unavailable: {exc} — using MockEmbedding")
             return MockEmbedding(embed_dim=384)

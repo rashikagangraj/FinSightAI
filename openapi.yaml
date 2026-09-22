@@ -1,0 +1,1068 @@
+openapi: 3.1.0
+info:
+  title: FinSight AI API
+  description: "Financial Intelligence & Decision Platform \u2014 Turn financial documents\
+    \ into business decisions. Supports Gemini, OpenAI, and Ollama backends."
+  version: 0.2.0
+paths:
+  /documents/ingest:
+    post:
+      tags:
+      - documents
+      summary: Ingest Document
+      operationId: ingest_document_documents_ingest_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_ingest_document_documents_ingest_post'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentIngestResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /documents/:
+    get:
+      tags:
+      - documents
+      summary: List Documents
+      operationId: list_documents_documents__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentListResponse'
+      security:
+      - HTTPBearer: []
+  /documents/{source_name}:
+    delete:
+      tags:
+      - documents
+      summary: Delete Document
+      operationId: delete_document_documents__source_name__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: source_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Source Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentActionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /documents/clear:
+    post:
+      tags:
+      - documents
+      summary: Clear Documents
+      operationId: clear_documents_documents_clear_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentActionResponse'
+      security:
+      - HTTPBearer: []
+  /documents/seed-samples:
+    post:
+      tags:
+      - documents
+      summary: Seed Samples
+      operationId: seed_samples_documents_seed_samples_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeedSampleResponse'
+      security:
+      - HTTPBearer: []
+  /query/:
+    post:
+      tags:
+      - query
+      summary: Query Agent
+      operationId: query_agent_query__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /query/ratio:
+    post:
+      tags:
+      - query
+      summary: Calculate Ratio
+      description: Safely calculate financial ratios like P/E, ROA, ROE, Margin, Debt-to-Equity.
+      operationId: calculate_ratio_query_ratio_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialRatioRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRatioResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /query/stream:
+    get:
+      tags:
+      - query
+      summary: Query Agent Stream
+      description: 'SSE streaming endpoint. Usage: GET /query/stream?q=your+question'
+      operationId: query_agent_stream_query_stream_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: q
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Q
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /cases/:
+    get:
+      tags:
+      - case-studies
+      summary: Get Cases
+      operationId: get_cases_cases__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: topic
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by topic (e.g. M&A, DCF Valuation)
+          title: Topic
+        description: Filter by topic (e.g. M&A, DCF Valuation)
+      - name: difficulty
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by difficulty (Beginner, Intermediate, Advanced, Expert)
+          title: Difficulty
+        description: Filter by difficulty (Beginner, Intermediate, Advanced, Expert)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CaseStudy'
+                title: Response Get Cases Cases  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /cases/{case_id}:
+    get:
+      tags:
+      - case-studies
+      summary: Get Case
+      operationId: get_case_cases__case_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: case_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Case Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseStudy'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /cases/generate:
+    post:
+      tags:
+      - case-studies
+      summary: Generate Case
+      operationId: generate_case_cases_generate_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateCaseRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseStudy'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /cases/simulate:
+    post:
+      tags:
+      - case-studies
+      summary: Simulate Case
+      operationId: simulate_case_cases_simulate_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulationResult'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /cases/evaluate:
+    post:
+      tags:
+      - case-studies
+      summary: Evaluate Case
+      operationId: evaluate_case_cases_evaluate_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSubmission'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationFeedback'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /cases/leaderboard/list:
+    get:
+      tags:
+      - case-studies
+      summary: Get Leaderboard
+      operationId: get_leaderboard_cases_leaderboard_list_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/LeaderboardEntry'
+                type: array
+                title: Response Get Leaderboard Cases Leaderboard List Get
+      security:
+      - HTTPBearer: []
+  /cases/leaderboard/add:
+    post:
+      tags:
+      - case-studies
+      summary: Add Leaderboard Entry
+      operationId: add_leaderboard_entry_cases_leaderboard_add_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaderboardEntry'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardEntry'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /health:
+    get:
+      tags:
+      - system
+      summary: Health
+      operationId: health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/info:
+    get:
+      tags:
+      - system
+      summary: Api Info
+      operationId: api_info_api_info_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    Body_ingest_document_documents_ingest_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_ingest_document_documents_ingest_post
+    CaseStudy:
+      properties:
+        id:
+          type: string
+          title: Id
+        title:
+          type: string
+          title: Title
+        company_name:
+          type: string
+          title: Company Name
+        ticker:
+          type: string
+          title: Ticker
+          default: ''
+        industry:
+          type: string
+          title: Industry
+        topic:
+          type: string
+          enum:
+          - M&A
+          - DCF Valuation
+          - Equity Research
+          - Credit & Distress
+          - Growth Investment
+          - Corporate Finance
+          title: Topic
+        difficulty:
+          type: string
+          enum:
+          - Beginner
+          - Intermediate
+          - Advanced
+          - Expert
+          title: Difficulty
+        headline:
+          type: string
+          title: Headline
+        description:
+          type: string
+          title: Description
+        key_question:
+          type: string
+          title: Key Question
+        context_dossier:
+          type: string
+          title: Context Dossier
+        historical_financials:
+          items:
+            $ref: '#/components/schemas/FinancialHistorical'
+          type: array
+          title: Historical Financials
+        current_metrics:
+          additionalProperties: true
+          type: object
+          title: Current Metrics
+        ground_truth_insights:
+          items:
+            type: string
+          type: array
+          title: Ground Truth Insights
+        potential_risks:
+          items:
+            type: string
+          type: array
+          title: Potential Risks
+        consensus_decision:
+          type: string
+          title: Consensus Decision
+          default: BUY
+        target_valuation_range:
+          type: string
+          title: Target Valuation Range
+          default: $45B - $52B
+      type: object
+      required:
+      - id
+      - title
+      - company_name
+      - industry
+      - topic
+      - difficulty
+      - headline
+      - description
+      - key_question
+      - context_dossier
+      title: CaseStudy
+    DocumentActionResponse:
+      properties:
+        message:
+          type: string
+          title: Message
+        deleted_chunks:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Deleted Chunks
+        cleared_chunks:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Cleared Chunks
+      type: object
+      required:
+      - message
+      title: DocumentActionResponse
+    DocumentIngestResponse:
+      properties:
+        message:
+          type: string
+          title: Message
+        nodes_indexed:
+          type: integer
+          title: Nodes Indexed
+        filename:
+          type: string
+          title: Filename
+      type: object
+      required:
+      - message
+      - nodes_indexed
+      - filename
+      title: DocumentIngestResponse
+    DocumentListResponse:
+      properties:
+        sources:
+          items:
+            type: string
+          type: array
+          title: Sources
+        total_chunks:
+          type: integer
+          title: Total Chunks
+      type: object
+      required:
+      - sources
+      - total_chunks
+      title: DocumentListResponse
+    EvaluationFeedback:
+      properties:
+        overall_score:
+          type: integer
+          title: Overall Score
+        grade:
+          type: string
+          title: Grade
+        verdict:
+          type: string
+          title: Verdict
+        scores_breakdown:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Scores Breakdown
+        ai_consensus_decision:
+          type: string
+          title: Ai Consensus Decision
+        strengths:
+          items:
+            type: string
+          type: array
+          title: Strengths
+        identified_mistakes:
+          items:
+            type: string
+          type: array
+          title: Identified Mistakes
+        unaddressed_risks:
+          items:
+            type: string
+          type: array
+          title: Unaddressed Risks
+        expert_coaching_advice:
+          type: string
+          title: Expert Coaching Advice
+        recommended_model_adjustments:
+          additionalProperties: true
+          type: object
+          title: Recommended Model Adjustments
+      type: object
+      required:
+      - overall_score
+      - grade
+      - verdict
+      - scores_breakdown
+      - ai_consensus_decision
+      - strengths
+      - identified_mistakes
+      - unaddressed_risks
+      - expert_coaching_advice
+      title: EvaluationFeedback
+    FinancialHistorical:
+      properties:
+        year:
+          type: string
+          title: Year
+        revenue:
+          type: number
+          title: Revenue
+        cogs:
+          type: number
+          title: Cogs
+        gross_profit:
+          type: number
+          title: Gross Profit
+        operating_expenses:
+          type: number
+          title: Operating Expenses
+        ebitda:
+          type: number
+          title: Ebitda
+        net_income:
+          type: number
+          title: Net Income
+        capex:
+          type: number
+          title: Capex
+        fcf:
+          type: number
+          title: Fcf
+      type: object
+      required:
+      - year
+      - revenue
+      - cogs
+      - gross_profit
+      - operating_expenses
+      - ebitda
+      - net_income
+      - capex
+      - fcf
+      title: FinancialHistorical
+    FinancialRatioRequest:
+      properties:
+        numerator:
+          type: number
+          title: Numerator
+        denominator:
+          type: number
+          title: Denominator
+        ratio_name:
+          type: string
+          title: Ratio Name
+          default: custom_ratio
+      type: object
+      required:
+      - numerator
+      - denominator
+      title: FinancialRatioRequest
+    FinancialRatioResponse:
+      properties:
+        ratio_name:
+          type: string
+          title: Ratio Name
+        value:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Value
+        numerator:
+          type: number
+          title: Numerator
+        denominator:
+          type: number
+          title: Denominator
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - ratio_name
+      - numerator
+      - denominator
+      title: FinancialRatioResponse
+    GenerateCaseRequest:
+      properties:
+        industry:
+          type: string
+          title: Industry
+          default: Enterprise AI & Cloud
+        topic:
+          type: string
+          title: Topic
+          default: M&A
+        difficulty:
+          type: string
+          title: Difficulty
+          default: Intermediate
+      type: object
+      title: GenerateCaseRequest
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HealthResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        llm_backend:
+          type: string
+          title: Llm Backend
+        model:
+          type: string
+          title: Model
+        embed_model:
+          type: string
+          title: Embed Model
+        document_chunks:
+          type: integer
+          title: Document Chunks
+        version:
+          type: string
+          title: Version
+          default: 0.1.0
+      type: object
+      required:
+      - status
+      - llm_backend
+      - model
+      - embed_model
+      - document_chunks
+      title: HealthResponse
+    LeaderboardEntry:
+      properties:
+        user_name:
+          type: string
+          title: User Name
+        case_id:
+          type: string
+          title: Case Id
+        case_title:
+          type: string
+          title: Case Title
+        score:
+          type: integer
+          title: Score
+        grade:
+          type: string
+          title: Grade
+        decision:
+          type: string
+          title: Decision
+        timestamp:
+          type: string
+          title: Timestamp
+      type: object
+      required:
+      - user_name
+      - case_id
+      - case_title
+      - score
+      - grade
+      - decision
+      - timestamp
+      title: LeaderboardEntry
+    QueryRequest:
+      properties:
+        query:
+          type: string
+          maxLength: 2000
+          minLength: 3
+          title: Query
+          description: Financial question to answer
+        top_k:
+          type: integer
+          maximum: 20.0
+          minimum: 1.0
+          title: Top K
+          default: 5
+        stream:
+          type: boolean
+          title: Stream
+          default: false
+      type: object
+      required:
+      - query
+      title: QueryRequest
+    QueryResponse:
+      properties:
+        query:
+          type: string
+          title: Query
+        answer:
+          type: string
+          title: Answer
+        sources:
+          items:
+            type: string
+          type: array
+          title: Sources
+        intent:
+          type: string
+          title: Intent
+        agent_trace:
+          items:
+            type: string
+          type: array
+          title: Agent Trace
+        tokens_estimated:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Tokens Estimated
+      type: object
+      required:
+      - query
+      - answer
+      - sources
+      - intent
+      - agent_trace
+      title: QueryResponse
+    ScenarioParams:
+      properties:
+        revenue_growth_delta_pct:
+          type: number
+          title: Revenue Growth Delta Pct
+          default: 0.0
+        ebitda_margin_delta_pct:
+          type: number
+          title: Ebitda Margin Delta Pct
+          default: 0.0
+        wacc_pct:
+          type: number
+          title: Wacc Pct
+          default: 9.5
+        terminal_growth_pct:
+          type: number
+          title: Terminal Growth Pct
+          default: 2.5
+        exit_multiple:
+          type: number
+          title: Exit Multiple
+          default: 12.0
+        tax_rate_pct:
+          type: number
+          title: Tax Rate Pct
+          default: 21.0
+        capex_pct_rev:
+          type: number
+          title: Capex Pct Rev
+          default: 4.5
+        net_debt:
+          type: number
+          title: Net Debt
+          default: 0.0
+        shares_outstanding_m:
+          type: number
+          title: Shares Outstanding M
+          default: 100.0
+      type: object
+      title: ScenarioParams
+    SeedSampleResponse:
+      properties:
+        message:
+          type: string
+          title: Message
+        seeded_files:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Seeded Files
+        total_chunks:
+          type: integer
+          title: Total Chunks
+      type: object
+      required:
+      - message
+      - seeded_files
+      - total_chunks
+      title: SeedSampleResponse
+    SimulateRequest:
+      properties:
+        case_id:
+          type: string
+          title: Case Id
+        scenario_params:
+          $ref: '#/components/schemas/ScenarioParams'
+      type: object
+      required:
+      - case_id
+      - scenario_params
+      title: SimulateRequest
+    SimulationResult:
+      properties:
+        projected_years:
+          items:
+            type: string
+          type: array
+          title: Projected Years
+        projected_revenue:
+          items:
+            type: number
+          type: array
+          title: Projected Revenue
+        projected_ebitda:
+          items:
+            type: number
+          type: array
+          title: Projected Ebitda
+        projected_fcf:
+          items:
+            type: number
+          type: array
+          title: Projected Fcf
+        pv_fcf:
+          type: number
+          title: Pv Fcf
+        terminal_value_dcf:
+          type: number
+          title: Terminal Value Dcf
+        enterprise_value_dcf:
+          type: number
+          title: Enterprise Value Dcf
+        equity_value_dcf:
+          type: number
+          title: Equity Value Dcf
+        implied_share_price_dcf:
+          type: number
+          title: Implied Share Price Dcf
+        enterprise_value_multiple:
+          type: number
+          title: Enterprise Value Multiple
+        implied_share_price_multiple:
+          type: number
+          title: Implied Share Price Multiple
+        waterfall:
+          additionalProperties:
+            type: number
+          type: object
+          title: Waterfall
+        scenarios:
+          additionalProperties:
+            additionalProperties: true
+            type: object
+          type: object
+          title: Scenarios
+        sensitivity_matrix:
+          additionalProperties: true
+          type: object
+          title: Sensitivity Matrix
+      type: object
+      required:
+      - projected_years
+      - projected_revenue
+      - projected_ebitda
+      - projected_fcf
+      - pv_fcf
+      - terminal_value_dcf
+      - enterprise_value_dcf
+      - equity_value_dcf
+      - implied_share_price_dcf
+      - enterprise_value_multiple
+      - implied_share_price_multiple
+      - waterfall
+      - scenarios
+      - sensitivity_matrix
+      title: SimulationResult
+    UserSubmission:
+      properties:
+        case_id:
+          type: string
+          title: Case Id
+        user_decision:
+          type: string
+          enum:
+          - STRONG BUY
+          - BUY
+          - HOLD
+          - SELL
+          - INVEST
+          - PASS / REJECT
+          title: User Decision
+        target_price:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Target Price
+        target_valuation:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Target Valuation
+        key_assumptions:
+          type: string
+          title: Key Assumptions
+        strategic_rationale:
+          type: string
+          title: Strategic Rationale
+        risk_assessment:
+          type: string
+          title: Risk Assessment
+        applied_scenario_params:
+          anyOf:
+          - $ref: '#/components/schemas/ScenarioParams'
+          - type: 'null'
+      type: object
+      required:
+      - case_id
+      - user_decision
+      - key_assumptions
+      - strategic_rationale
+      - risk_assessment
+      title: UserSubmission
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

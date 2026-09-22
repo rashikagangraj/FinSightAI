@@ -1,0 +1,59 @@
+# ─────────────────────────────────────────────────────────────────────────
+# aiKart Agent Manifest — FinSight AI
+#
+# Upload this file on the aiKart listing form to power the "Try Me Now" feature.
+# ─────────────────────────────────────────────────────────────────────────
+
+apiVersion: aikart.dev/v1
+kind: AgentManifest
+
+metadata:
+  name: finsight-ai
+  displayName: "FinSight AI — Financial Intelligence Agent"
+  description: "Autonomous financial intelligence agent for balance sheet analysis, ratio calculations, multi-company comparisons, and grounded SEC filing Q&A."
+
+runtime:
+  type: docker
+  # Replace with your published Docker Hub or GitHub Container Registry image:
+  image: "rashikagangraj/finsight-ai:latest"
+  command: ["python", "scripts/aikart_runner.py"]
+
+resources:
+  cpu: 0.5             # vCPUs
+  memoryMb: 1024       # MB of RAM for embedding search & Chroma
+  timeoutSeconds: 90   # Execution timeout
+
+inputs:
+  - name: query
+    label: "Financial Question or Analysis Prompt"
+    type: textarea
+    required: true
+
+  - name: analysis_type
+    label: "Analysis Mode"
+    type: select
+    required: false
+    options:
+      - "Comprehensive Financial Analysis"
+      - "Financial Ratio & Health Assessment"
+      - "Revenue & Cash Flow Deep-Dive"
+      - "Comparative Company Analysis"
+    default: "Comprehensive Financial Analysis"
+
+secrets:
+  - name: GEMINI_API_KEY
+    description: "Google Gemini API key for LLM analysis and vector embeddings."
+    required: true
+
+  - name: OPENAI_API_KEY
+    description: "Optional OpenAI API key for alternative LLM backend."
+    required: false
+
+output:
+  format: markdown
+
+security:
+  networkEgress: allowlist
+  egressAllowlist:
+    - "generativelanguage.googleapis.com"
+    - "api.openai.com"

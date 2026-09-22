@@ -7,8 +7,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.api.main import app
+from src.core.config import get_settings
 
-client = TestClient(app)
+cfg = get_settings()
+auth_headers = {"Authorization": f"Bearer {cfg.api_key}"} if cfg.api_key else {}
+client = TestClient(app, headers=auth_headers)
 
 
 def test_health_endpoint():
