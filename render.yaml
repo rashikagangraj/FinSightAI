@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: finsight-ai
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn src.api.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: LLM_BACKEND
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemini-1.5-flash
+      - key: GEMINI_EMBED_MODEL
+        value: text-embedding-004
+      - key: CHROMA_PERSIST_DIR
+        value: ./data/chroma
+      - key: TOP_K_RETRIEVAL
+        value: "5"
+      - key: LOG_LEVEL
+        value: INFO
