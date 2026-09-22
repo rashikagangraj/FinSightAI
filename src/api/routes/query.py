@@ -23,13 +23,21 @@ router = APIRouter(prefix="/query", tags=["query"], dependencies=[Depends(requir
 logger = get_logger(__name__)
 
 
+@router.get("/", tags=["query"])
+async def query_info() -> dict:
+    return {
+        "message": "The query endpoint accepts HTTP POST requests with a JSON body: {'query': '...'}",
+        "docs_url": "/docs",
+        "sample_payload": {"query": "What is AIKART's revenue and net profit?"},
+    }
+
+
 @router.post("/", response_model=QueryResponse)
 async def query_agent(request: QueryRequest) -> QueryResponse:
     if get_document_count() == 0:
-        raise HTTPException(
-            status_code=400,
-            detail="No documents indexed yet. Upload a document or click 'Seed Sample Data' on the dashboard first.",
-        )
+        from src.rag.indexer import seed_sample_documents
+        logger.info("No documents found in index; auto-seeding benchmark dataset...")
+        seed_sample_documents()
 
     try:
         state = await asyncio.get_event_loop().run_in_executor(
