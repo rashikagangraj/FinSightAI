@@ -91,6 +91,7 @@ def _merge_yaml_into_env(yaml_path: str = "config.yaml") -> None:
 
     mapping = {
         "llm_backend": data.get("llm_backend"),
+        "gemini_api_key": (data.get("gemini") or {}).get("api_key"),
         "gemini_model": (data.get("gemini") or {}).get("model"),
         "gemini_embed_model": (data.get("gemini") or {}).get("embed_model"),
         "gemini_temperature": (data.get("gemini") or {}).get("temperature"),

@@ -38,6 +38,11 @@ async def query_agent(request: QueryRequest) -> QueryResponse:
         from src.rag.indexer import seed_sample_documents
         logger.info("No documents found in index; auto-seeding benchmark dataset...")
         seed_sample_documents()
+        if get_document_count() == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="No documents indexed yet. Please upload documents or run seed.",
+            )
 
     try:
         state = await asyncio.get_event_loop().run_in_executor(

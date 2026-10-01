@@ -1,4 +1,7 @@
+import time
+from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Any
 
 import uvicorn
 from fastapi import FastAPI
@@ -17,6 +20,19 @@ setup_logging(get_settings().log_level)
 logger = get_logger(__name__)
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Pre-warm configuration and ChromaDB singleton on startup to eliminate cold-start lag."""
+    cfg = get_settings()
+    try:
+        from src.rag.indexer import _get_chroma_collection
+        _get_chroma_collection()
+    except Exception as exc:
+        logger.warning(f"ChromaDB pre-warm notice: {exc}")
+    logger.info(f"FinSight AI API ready | backend={cfg.llm_backend} model={cfg.active_model}")
+    yield
+
+
 def create_app() -> FastAPI:
     cfg = get_settings()
     app = FastAPI(
@@ -28,6 +44,7 @@ def create_app() -> FastAPI:
         version="0.2.0",
         docs_url="/docs",
         redoc_url="/redoc",
+        lifespan=lifespan,
     )
 
     app.add_middleware(
@@ -48,6 +65,16 @@ def create_app() -> FastAPI:
         from fastapi.staticfiles import StaticFiles
         app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
+    @app.get("/ping", tags=["system"], summary="UptimeRobot / Keep-Alive Ping")
+    @app.get("/healthz", tags=["system"], include_in_schema=False)
+    async def ping() -> dict[str, Any]:
+        """Ultra-fast, zero-overhead health check endpoint for UptimeRobot / Keep-Alive monitors."""
+        return {
+            "status": "ok",
+            "service": "FinSightAI",
+            "timestamp": time.time(),
+        }
+
     @app.get("/health", response_model=HealthResponse, tags=["system"])
     async def health() -> HealthResponse:
         return HealthResponse(
@@ -64,13 +91,14 @@ def create_app() -> FastAPI:
             "name": "FinSight AI API",
             "subtitle": "Financial Intelligence Agent",
             "tagline": "Turn financial documents into business decisions.",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "status": "online",
             "llm_backend": cfg.llm_backend,
             "model": cfg.active_model,
             "embed_model": cfg.active_embed_model,
             "document_chunks": get_document_count(),
             "endpoints": {
+                "ping": "/ping",
                 "health": "/health",
                 "info": "/api/info",
                 "query": "/query/",
@@ -94,7 +122,6 @@ def create_app() -> FastAPI:
         async def serve_fallback():
             return HTMLResponse(content="<h1>FinSight AI API is running</h1>")
 
-    logger.info(f"FinSight AI API ready | backend={cfg.llm_backend} model={cfg.active_model}")
     return app
 
 

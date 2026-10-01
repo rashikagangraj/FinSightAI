@@ -19,8 +19,9 @@ class GeminiClient(LLMClient):
         if not cfg.gemini_api_key or cfg.gemini_api_key.startswith("placeholder"):
             raise ValueError("Gemini API key is missing or set to placeholder.")
         self._api_key = cfg.gemini_api_key
-        self._model = cfg.gemini_model
-        self._embed_model = cfg.gemini_embed_model
+        # Clean model name (remove prefix if user added models/)
+        self._model = cfg.gemini_model.removeprefix("models/")
+        self._embed_model = cfg.gemini_embed_model.removeprefix("models/")
         self._temperature = cfg.gemini_temperature
         self._max_tokens = cfg.gemini_max_tokens
 
@@ -50,7 +51,11 @@ class GeminiClient(LLMClient):
         except Exception as exc:
             logger.warning(f"Gemini OpenAI-compat call failed: {exc}, attempting direct REST API...")
             # Fallback to direct Google Generative Language REST API
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{self._model}:generateContent?key={self._api_key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{self._model}:generateContent"
+            headers = {
+                "x-goog-api-key": self._api_key,
+                "Content-Type": "application/json",
+            }
             contents = []
             if system:
                 contents.append({"role": "user", "parts": [{"text": f"System instructions: {system}"}]})
@@ -59,6 +64,7 @@ class GeminiClient(LLMClient):
             with httpx.Client(timeout=10.0) as http_client:
                 res = http_client.post(
                     url,
+                    headers=headers,
                     json={"contents": contents, "generationConfig": {"temperature": self._temperature, "maxOutputTokens": self._max_tokens}},
                 )
                 res.raise_for_status()

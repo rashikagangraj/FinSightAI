@@ -105,21 +105,37 @@ def _get_embed_model() -> Any:
 
 
 
+_chroma_client: chromadb.PersistentClient | None = None
+_chroma_collection: chromadb.Collection | None = None
+
+
+def _get_chroma_client() -> chromadb.PersistentClient:
+    global _chroma_client
+    if _chroma_client is None:
+        cfg = get_settings()
+        _chroma_client = chromadb.PersistentClient(path=cfg.chroma_persist_dir)
+    return _chroma_client
+
+
 def _get_chroma_collection() -> chromadb.Collection:
-    cfg = get_settings()
-    client = chromadb.PersistentClient(path=cfg.chroma_persist_dir)
-    return client.get_or_create_collection(cfg.chroma_collection_name)
+    global _chroma_collection
+    if _chroma_collection is None:
+        cfg = get_settings()
+        client = _get_chroma_client()
+        _chroma_collection = client.get_or_create_collection(cfg.chroma_collection_name)
+    return _chroma_collection
 
 
 def reset_collection() -> None:
     """Clear all documents in the ChromaDB collection."""
+    global _chroma_collection
     cfg = get_settings()
-    client = chromadb.PersistentClient(path=cfg.chroma_persist_dir)
+    client = _get_chroma_client()
     try:
         client.delete_collection(cfg.chroma_collection_name)
     except Exception:
         pass
-    client.get_or_create_collection(cfg.chroma_collection_name)
+    _chroma_collection = client.get_or_create_collection(cfg.chroma_collection_name)
 
 
 def _build_storage_context(collection: chromadb.Collection) -> StorageContext:

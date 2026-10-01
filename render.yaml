@@ -2,11 +2,17 @@ services:
   - type: web
     name: finsight-ai
     runtime: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn src.api.main:app --host 0.0.0.0 --port $PORT"
+    buildCommand: "pip install --no-cache-dir --prefer-binary -r requirements.txt"
+    startCommand: "uvicorn src.api.main:app --host 0.0.0.0 --port $PORT --workers 1"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PYTHONDONTWRITEBYTECODE
+        value: "1"
+      - key: MALLOC_TRIM_THRESHOLD_
+        value: "100000"
       - key: LLM_BACKEND
         value: gemini
       - key: GEMINI_MODEL
@@ -19,3 +25,4 @@ services:
         value: "5"
       - key: LOG_LEVEL
         value: INFO
+

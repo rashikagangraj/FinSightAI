@@ -14,6 +14,20 @@ auth_headers = {"Authorization": f"Bearer {cfg.api_key}"} if cfg.api_key else {}
 client = TestClient(app, headers=auth_headers)
 
 
+def test_ping_endpoint():
+    response = client.get("/ping")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert data["service"] == "FinSightAI"
+    assert "timestamp" in data
+
+    # Also check /healthz alias
+    res_z = client.get("/healthz")
+    assert res_z.status_code == 200
+    assert res_z.json()["status"] == "ok"
+
+
 def test_health_endpoint():
     response = client.get("/health")
     assert response.status_code == 200
