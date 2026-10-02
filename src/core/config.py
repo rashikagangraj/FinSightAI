@@ -23,8 +23,8 @@ class Settings(BaseSettings):
 
     # Gemini
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-1.5-flash"
-    gemini_embed_model: str = "text-embedding-004"
+    gemini_model: str = "gemini-3.8-flash"
+    gemini_embed_model: str = "gemini-embedding-001"
     gemini_temperature: float = 0.1
     gemini_max_tokens: int = 2048
 
@@ -58,6 +58,11 @@ class Settings(BaseSettings):
     api_port: int = 8000
     log_level: str = "INFO"
     api_key: str = ""  # if set, Bearer token required on /query, /documents, /cases
+
+    # Keep-alive: self-ping /ping so Render's free tier doesn't spin the service down after 15 min idle.
+    # Falls back to RENDER_EXTERNAL_URL (set automatically by Render); disabled when no URL or interval <= 0.
+    keep_alive_url: str = ""
+    keep_alive_interval_seconds: int = 600
 
     # Agent
     agent_max_iterations: int = 10

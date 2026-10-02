@@ -1,8 +1,11 @@
+import asyncio
+import os
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
+import httpx
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +23,18 @@ setup_logging(get_settings().log_level)
 logger = get_logger(__name__)
 
 
+async def _keep_alive(url: str, interval: int) -> None:
+    """Ping our own public /ping endpoint so Render's free tier never sees 15 min of idle time."""
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        while True:
+            await asyncio.sleep(interval)
+            try:
+                resp = await client.get(url)
+                logger.debug(f"Keep-alive ping {url} -> {resp.status_code}")
+            except Exception as exc:
+                logger.warning(f"Keep-alive ping failed: {exc}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Pre-warm configuration and ChromaDB singleton on startup to eliminate cold-start lag."""
@@ -29,8 +44,20 @@ async def lifespan(app: FastAPI):
         _get_chroma_collection()
     except Exception as exc:
         logger.warning(f"ChromaDB pre-warm notice: {exc}")
+
+    keep_alive_task = None
+    base_url = (cfg.keep_alive_url or os.getenv("RENDER_EXTERNAL_URL", "")).rstrip("/")
+    if base_url and cfg.keep_alive_interval_seconds > 0:
+        keep_alive_task = asyncio.create_task(
+            _keep_alive(f"{base_url}/ping", cfg.keep_alive_interval_seconds)
+        )
+        logger.info(f"Keep-alive enabled | {base_url}/ping every {cfg.keep_alive_interval_seconds}s")
+
     logger.info(f"FinSight AI API ready | backend={cfg.llm_backend} model={cfg.active_model}")
     yield
+
+    if keep_alive_task:
+        keep_alive_task.cancel()
 
 
 def create_app() -> FastAPI:
